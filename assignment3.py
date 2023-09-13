@@ -7,7 +7,7 @@ class Car:
     def __init__(self):
         # every car has a personal target speed
         self.target = np.random.normal(100, 4)  # km/h
-        self.speed = self.target
+        self.speed = 60
         self.age = 0  # seconds
         self.distance = 0  # km
         self.lane = 0
@@ -35,12 +35,12 @@ class Car:
 
 
 class Road:
-    def __init__(self, length, spawn_prob=0.1):
+    def __init__(self, length, spawn_prob_per_sec=0.1):
         self.length = length  # km
         self.vehicles: list[Car] = []
         self.time_taken = []
-        self.time_step_size = .2  # seconds
-        self.spawn_prob = spawn_prob
+        self.time_step_size = 1  # seconds
+        self.spawn_prob = spawn_prob_per_sec * self.time_step_size
 
     def step(self):
         switch_lane_action = [False for _ in range(len(self.vehicles))]
@@ -86,8 +86,11 @@ class Road:
             if self.vehicles[i].distance >= self.length:
                 self.time_taken.append(self.vehicles[i].age)
 
-        if np.random.random() < self.spawn_prob:
+        if np.random.random() < self.spawn_prob and (len(self.vehicles) == 0 or self.vehicles[-1].distance > 0.02):
             self.vehicles.append(Car())
+            if len(self.vehicles) > 1 and self.vehicles[-2].distance < 0.1:
+                self.vehicles[-1].speed = min(self.vehicles[-2].speed, self.vehicles[-1].speed)
+
 
         self.vehicles = [car for car in self.vehicles if car.distance < self.length]
         self.vehicles = list(sorted(self.vehicles, key=lambda x: x.distance, reverse=True))
@@ -113,7 +116,7 @@ class Road:
         plt.show()
 
 
-road = Road(5, 0.05)
+road = Road(5, 0.5)
 
 for i in range(10000):
     road.step()

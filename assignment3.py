@@ -5,9 +5,11 @@ from scipy.stats import norm
 
 class Car:
     def __init__(self):
-        self.speed = np.random.normal(100, 4)
-        self.age = 0
-        self.distance = 0
+        # every car has a personal target speed
+        self.target = np.random.normal(100, 4)  # km/h
+        self.speed = self.target
+        self.age = 0  # seconds
+        self.distance = 0  # km
         self.lane = 0
 
     def step(self, time_step_size):
@@ -15,7 +17,7 @@ class Car:
         self.distance += self.speed * time_step_size / 3600
 
     def brake(self, time_step_size):
-        self.speed -= 5 * time_step_size
+        self.speed -= 20 * time_step_size
         if self.speed < 0:
             self.speed = 0
 
@@ -29,25 +31,22 @@ class Car:
             self.brake(time_step_size)
 
     def get_target(self):
-        if self.lane == 0:
-            return 100
-        elif self.lane == 1:
-            return 120
+        return self.target + 20 * self.lane
 
 
 class Road:
     def __init__(self, length, spawn_prob=0.1):
-        self.length = length
+        self.length = length  # km
         self.vehicles: list[Car] = []
         self.time_taken = []
-        self.time_step_size = 1
+        self.time_step_size = .2  # seconds
         self.spawn_prob = spawn_prob
 
     def step(self):
         switch_lane_action = [False for _ in range(len(self.vehicles))]
         for i, car in enumerate(self.vehicles):
             cars_in_front = []
-            j = i - 1
+            j = i - 1  # vehicles are ordered largest distance to smallest
             while j >= 0 and self.vehicles[j].distance - car.distance < 55e-3:
                 cars_in_front.append(self.vehicles[j])
                 j -= 1
@@ -93,8 +92,6 @@ class Road:
         self.vehicles = [car for car in self.vehicles if car.distance < self.length]
         self.vehicles = list(sorted(self.vehicles, key=lambda x: x.distance, reverse=True))
 
-        print(self.vehicles[0].distance if len(self.vehicles) > 0 else None)
-
     def get_average_time(self):
         return np.mean(self.time_taken)
 
@@ -116,7 +113,7 @@ class Road:
         plt.show()
 
 
-road = Road(5, 0.1)
+road = Road(5, 0.05)
 
 for i in range(10000):
     road.step()

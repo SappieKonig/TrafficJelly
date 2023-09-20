@@ -28,14 +28,14 @@ class Simulation:
     __dt = 1  # seconds
     __scale = 1
     __road_length = 1000
-    __lane_count = 2
+    __lane_count = 3
 
     def __init__(self):
         self.__cars = {
             i: SimulationCar(
                 id=i,
                 x=i * 30, v=50, a=0,
-                lane=0,
+                lane=int(random.random() < 0.4),
                 color=get_random_color()
             ) for i in range(50)
         }
@@ -53,6 +53,8 @@ class Simulation:
             car.x += car.v * self.__dt
             if not 0 <= car.x <= self.__road_length:
                 car_ids_to_delete.append(car_id)
+            if random.random() < 0.1:
+                car.lane = 1 - car.lane
         for car_id in car_ids_to_delete:
             del self.__cars[car_id]
 
@@ -86,23 +88,37 @@ class GraphicsCar:
 
 class Camera(metaclass=ABCMeta):
     @abstractmethod
-    def get_x_center(self) -> float: pass
+    def get_x_center(self, state: 'GameState') -> float: pass
 
 
 class StationaryCamera(Camera):
     def __init__(self, x_center):
         self.__x_center = x_center
 
-    def get_x_center(self) -> float:
+    def get_x_center(self, state: 'GameState') -> float:
         return self.__x_center
 
 
 class CarCamera(Camera):
     def __init__(self, simulation: Simulation, car_id):
+        self.__car_id = car_id
         self.__simulation = simulation
+        self.__time_step = -1
+        self.__prev_x = simulation.get_car(car_id).x
+        self.__next_x = self.__prev_x
+        self.__last_x_center = 0
 
-    def get_x_center(self) -> float:
-        return self.simulation
+    def get_x_center(self, state: 'GameState') -> float:
+        if not self.__simulation.get_car(self.__car_id):
+            return self.__last_x_center
+        if self.__time_step < state.time_step:
+            self.__time_step = state.time_step
+            self.__prev_x = self.__next_x
+            self.__next_x = self.__simulation.get_car(self.__car_id).x
+        alpha = state.time % state.delta_time / state.delta_time
+        beta = 1 - alpha
+        self.__last_x_center = alpha * self.__next_x + beta * self.__prev_x
+        return self.__last_x_center
 
 
 MAX_SPEED = 300  # m/s
@@ -110,13 +126,14 @@ MAX_SPEED = 300  # m/s
 LANE_WIDTH = 3.5
 
 CAR_LENGTH = 4.5  # m
-CAR_WIDTH = 2  # m
-# CAR_WIDTH = LANE_WIDTH  # m
+# CAR_WIDTH = 2  # m
+CAR_WIDTH = LANE_WIDTH  # m
 
 
 @dataclass(kw_only=True)
 class GameState:
     time: float
+    delta_time: float
     time_step: int
     scale: float
     pan_offset_x: float
@@ -136,8 +153,6 @@ class Game:
         self.simulation = simulation
         self.camera = camera
 
-        self.simulation_dt = simulation.get_delta_time()
-        # self.simulation_scale = simulation.get_scale()
         self.lanes = simulation.get_lane_count()
 
         self.marginal_buffer = 100  # m
@@ -154,6 +169,7 @@ class Game:
         self.pan_rate_multiplier = 1
         self.state = GameState(
             time=0,
+            delta_time=simulation.get_delta_time(),
             time_step=-1,
             scale=1,
             pan_offset_x=0,
@@ -161,6 +177,9 @@ class Game:
             prev_cars={},
             next_cars={},
         )
+
+    def get_screen_center(self) -> tuple[int, int]:
+        return self.screen.get_rect().center
 
     def main(self):
         self.loop()
@@ -218,11 +237,11 @@ class Game:
     def update_viewport(self):
         if self.dt != 0:
             self.state.scale *= self.scale_rate ** (self.dt * self.scale_rate_multiplier)
-        self.state.pan_offset_x += self.dt * self.pan_rate_x * self.pan_rate_multiplier
-        self.state.pan_offset_y += self.dt * self.pan_rate_y * self.pan_rate_multiplier
+        self.state.pan_offset_x += self.dt * self.pan_rate_x * self.pan_rate_multiplier * self.state.scale
+        self.state.pan_offset_y += self.dt * self.pan_rate_y * self.pan_rate_multiplier * self.state.scale
 
     def update_state(self):
-        current_time_step = self.state.time // self.simulation_dt
+        current_time_step = self.state.time // self.state.delta_time
         while current_time_step - 1 > self.state.time_step:
             self.simulation.step_forward()
             self.state.time_step += 1
@@ -234,7 +253,7 @@ class Game:
             self.state.next_cars = self.get_graphics_cars(interval)
 
     def draw_road(self):
-        offset = self.get_offset()
+        offset = self.get_scaled_offset()
         road_rect = pygame.rect.Rect((
             0, 0,
             self.simulation.get_road_length() * self.state.scale,
@@ -246,12 +265,13 @@ class Game:
         pygame.draw.rect(self.screen, 'black', road_rect)
 
     def draw_cars(self):
-        offset = self.get_offset()
+        dt = self.state.delta_time
+        offset = self.get_scaled_offset()
 
         scale = self.state.scale
         # alpha = 0 -> interpolation is in next_cars
         # alpha = 1 -> interpolation is in prev_cars
-        alpha = self.state.time % self.simulation_dt / self.simulation_dt
+        alpha = self.state.time % dt / dt
         beta = 1 - alpha
 
         cars = self.state.next_cars
@@ -294,21 +314,30 @@ class Game:
 
     def get_displayed_cars_interval(self):
         screen_rect = self.screen.get_rect()
-        max_speed_buffer = self.simulation_dt * MAX_SPEED
-        origin = -self.state.pan_offset_x
+        max_speed_buffer = self.dt * MAX_SPEED
+        center = -self.get_offset().x + self.get_screen_center()[0] / self.state.scale
         radius = (screen_rect.width * 0.5 + max_speed_buffer) / self.state.scale + self.marginal_buffer
-        return origin - radius, origin + radius
+        return center - radius, center + radius
+
+    def get_scaled_offset(self):
+        return self.get_offset() * self.state.scale
 
     def get_offset(self):
-        screen_rect = self.screen.get_rect()
-        return pygame.Vector2(
-            screen_rect.width / 2 + self.state.pan_offset_x - self.camera.get_x_center(),
-            screen_rect.height / 2 + self.state.pan_offset_y,
+        scale = self.state.scale
+        return self.get_screen_center() + pygame.Vector2(
+            self.state.pan_offset_x * scale - self.camera.get_x_center(self.state),
+            self.state.pan_offset_y * scale,
         )
 
 
-if __name__ == '__main__':
+def main():
+    simulation = Simulation()
+    camera = StationaryCamera(500)
     Game(
-        simulation=Simulation(),
-        camera=StationaryCamera(400)
+        simulation=simulation,
+        camera=camera
     ).main()
+
+
+if __name__ == '__main__':
+    main()

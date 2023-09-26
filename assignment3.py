@@ -3,12 +3,21 @@ import matplotlib.pyplot as plt
 from scipy.stats import norm
 
 
-class BrakeAction:
+class BrakeHardAction:
     def __init__(self, time):
         self.time = time
 
     def __call__(self, car, time_step_size):
-        car.brake(time_step_size)
+        car.brake_hard(time_step_size)
+        self.time -= time_step_size
+
+
+class BrakeSoftAction:
+    def __init__(self, time):
+        self.time = time
+
+    def __call__(self, car, time_step_size):
+        car.brake_soft(time_step_size)
         self.time -= time_step_size
 
 
@@ -49,8 +58,13 @@ class Car:
             if self.action.time <= 0:
                 self.action = None
 
-    def brake(self, time_step_size):
+    def brake_hard(self, time_step_size):
         self.speed -= 20 * time_step_size
+        if self.speed < 0:
+            self.speed = 0
+
+    def brake_soft(self, time_step_size):
+        self.speed -= 5 * time_step_size
         if self.speed < 0:
             self.speed = 0
 
@@ -61,10 +75,10 @@ class Car:
         if np.random.normal(self.get_target(), 4) > self.speed:
             self.accelerate(time_step_size)
         else:
-            self.brake(time_step_size)
+            self.brake_soft(time_step_size)
 
     def get_target(self):
-        return self.target + 0 * self.lane
+        return self.target + 20 * self.lane
 
 
 class Road:
@@ -102,17 +116,21 @@ class Road:
 
             if car.lane == 0:
                 if not any([other_car.lane == 0 for other_car in cars_in_front]) and \
-                        not any((car.speed - other_car.speed) > 30 for other_car in cars_in_front_far):
-                    car.action = CruiseAction(.2)
-                    # car.renew_speed(self.time_step_size)
+                        not any((other_car.lane == 0 and ((car.speed - other_car.speed) > 30 or isinstance(other_car.action, BrakeHardAction)))
+                                for other_car in cars_in_front_far):
+                    car.action = CruiseAction(.5)
                 elif (not any([other_car.lane == 1 for other_car in cars_in_front])
                           and not any([other_car.lane == 1 for other_car in cars_in_back])):
                     switch_lane_action[i] = True
-                    car.action = AccelerateAction(.2)
-                    # car.accelerate(self.time_step_size)
+                    car.action = AccelerateAction(.5)
                 else:
-                    car.action = BrakeAction(.5)
-                    # car.brake(self.time_step_size)
+                    if any(other_car.lane == 0 and
+                           (isinstance(other_car.action, BrakeHardAction) or
+                            (car.speed - other_car.speed) > 30)
+                           for other_car in cars_in_front_far):
+                        car.action = BrakeHardAction(1)
+                    else:
+                        car.action = BrakeSoftAction(.5)
                     if any([other_car.lane == car.lane for other_car in cars_in_front]):
                         first_car_in_front = next((other_car for other_car in cars_in_front if other_car.lane == car.lane))
                         # when the car in front is driving slowly, shadow the speed (instead of full on braking)
@@ -123,17 +141,16 @@ class Road:
                 if (not any([other_car.lane == 0 for other_car in cars_in_front])
                         and not any([other_car.lane == 0 for other_car in cars_in_back])):
                     switch_lane_action[i] = True
-                    car.action = BrakeAction(.5)
-                    # car.brake(self.time_step_size)
+                    car.action = CruiseAction(.5)
                 elif not any([other_car.lane == 1 for other_car in cars_in_front]):
-                    car.action = CruiseAction(.2)
-                    # car.renew_speed(self.time_step_size)
+                    car.action = CruiseAction(.5)
                 else:
-                    car.action = BrakeAction(.5)
-                    # car.brake(self.time_step_size)
-                    # first_car_in_front = next((other_car for other_car in cars_in_front if other_car.lane == 1))
-                    # if car.speed < first_car_in_front.speed < 20:
-                    #     car.speed = first_car_in_front.speed
+                    if any(other_car.lane == 1 and
+                           (isinstance(other_car.action, BrakeHardAction) or
+                            (car.speed - other_car.speed) > 30)
+                           for other_car in cars_in_front_far):
+                        car.action = BrakeHardAction(1)
+                    car.action = BrakeSoftAction(.5)
 
         for i in range(len(self.vehicles)):
             if switch_lane_action[i]:
@@ -165,6 +182,10 @@ class Road:
                         print(f"Car 2: {self.vehicles[i + 1].lane}")
                         print(f"Car 1 speed: {self.vehicles[i].speed}")
                         print(f"Car 2 speed: {self.vehicles[i + 1].speed}")
+                        print(f"Car 1 target: {self.vehicles[i].target}")
+                        print(f"Car 2 target: {self.vehicles[i + 1].target}")
+                        print(f"Car 1 action: {self.vehicles[i].action}")
+                        print(f"Car 2 action: {self.vehicles[i + 1].action}")
 
     def get_average_time(self):
         return np.mean(self.time_taken)

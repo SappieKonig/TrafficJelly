@@ -7,6 +7,7 @@
 #include <fstream>
 #include <optional>
 #include <memory>
+#include <any>
 
 #include "utils.h"
 #include "car.h"
@@ -32,7 +33,7 @@ private:
     // Convenient utility for users
     std::unordered_map<std::string, std::shared_ptr<Node>> labelToNode;
 
-    TrafficModel();
+    TrafficModel() = default;
 
 public:
     // Model usage and interpretation
@@ -53,10 +54,36 @@ private:
 
 public:
     void addBasicCity(std::string label); // Not safe, if existent label
-    void addBasicRoad(std::string inNodeLabel, std::string outNodeLabel, std::string label, float length);
+    void addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float length);
     TrafficModel build();
 
     void save(std::string fn) const;
+};
+
+class TrafficModelStringDirector;
+
+class StringCommand
+{
+protected:
+    TrafficModelStringDirector& director;
+
+public:
+    StringCommand(TrafficModelStringDirector& director);
+    virtual void apply(std::vector<std::string>& args) const = 0;
+};
+
+class BasicCityStringCommand : public StringCommand
+{
+public:
+    BasicCityStringCommand(TrafficModelStringDirector& director);
+    void apply(std::vector<std::string>& args) const override;
+};
+
+class BasicRoadStringCommand : public StringCommand
+{
+public:
+    BasicRoadStringCommand(TrafficModelStringDirector& director);
+    void apply(std::vector<std::string>& args) const override;
 };
 
 /*
@@ -66,14 +93,17 @@ class TrafficModelStringDirector
 {
 private:
     std::string str;
-    std::unordered_map<std::string, std::function<void(std::reference_wrapper<std::vector<std::string>>)>> commander;
+    std::unordered_map<std::string, std::unique_ptr<StringCommand>> commander;
     TrafficModelBuilder trafficModelBuilder;
 
 public:
     TrafficModelStringDirector(std::string fn);
     TrafficModel build();
-    void addBasicCity(std::vector<std::string>& args); // Not safe, if existent label
+    void addBasicCity(std::vector<std::string>& args); // Not safe, if existent label. Also, probably should add argument object for more clarity of the parameters in code. Is getting tedious though.
     void addBasicRoad(std::vector<std::string>& args);
+
+    friend BasicCityStringCommand;
+    friend BasicRoadStringCommand;
 };
 
 /*

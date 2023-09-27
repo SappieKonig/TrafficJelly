@@ -1,1 +1,6 @@
-A,B,C,D,AB:A-B/2.1;BC:B-C/4.3;
+BasicCity:A
+BasicCity:B
+BasicCity:C
+BasicCity:D
+BasicRoad:AB,A,B,2.1
+BasicRoad:BC,B,C,4.3

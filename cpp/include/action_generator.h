@@ -4,6 +4,9 @@
 #include "utils.h"
 #include "route.h"
 #include "action.h"
+#include "observation.h"
+
+#include <memory>
 
 /*
  * This is an action generator abstract base class to generate actions for a car to take.
@@ -11,21 +14,22 @@
  */
 class ActionGenerator
 {
-private:
+protected:
     optional_const_reference<Checkpoint> checkpoint;
+    Car& actor;
 
 public:
-    ActionGenerator(optional_const_reference<Checkpoint> checkpoint);
+    ActionGenerator(Car& actor, optional_const_reference<Checkpoint> checkpoint);
     virtual ~ActionGenerator() = default;
-    virtual Action generateAction() = 0;
+    virtual std::unique_ptr<Action> generateAction(Observation& observation) = 0;
     void setCheckpoint(optional_const_reference<Checkpoint> checkpoint);
 };
 
 class BasicActionGenerator : public ActionGenerator
 {
 public:
-    BasicActionGenerator(optional_const_reference<Checkpoint> checkpoint);
-    Action generateAction() override;
+    BasicActionGenerator(Car& actor, optional_const_reference<Checkpoint> checkpoint);
+    std::unique_ptr<Action> generateAction(Observation& observation) override;
 };
 
 

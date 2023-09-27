@@ -11,7 +11,12 @@ Node::Node(std::string label)
 
 void Node::addCar(std::unique_ptr<Car>&&  car)
 {
-    cars.push_back(car);
+    cars.push_back(std::move(car));
+}
+
+std::string Node::getLabel() const
+{
+    return label;
 }
 
 BasicCity::BasicCity(std::string label)

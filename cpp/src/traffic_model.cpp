@@ -9,6 +9,7 @@ void TrafficModel::step(float dt)
     {
         node->step(dt);
     }
+
     for (auto& edge : edges)
     {
         edge->step(dt);
@@ -20,32 +21,67 @@ void TrafficModel::display() const
     std::cout << "Nodes:\n";
     for (auto& node : nodes)
     {
-        node->getLabel();
+        std::cout << "-" << node->getLabel() << "\n";
     }
 
     std::cout << "Edges:\n";
     for (auto& edge : edges)
     {
-        edge->getLabel();
+        std::cout << "-" << edge->getLabel() << "\n";
     }
 }
 
 void TrafficModelBuilder::addBasicCity(std::string label)
 {
-    trafficModel.nodes.emplace_back(new BasicCity(label));
-    trafficModel.labelToNode.emplace(label, trafficModel.nodes[-1]);
+    std::shared_ptr<Node> basicCity = std::make_shared<BasicCity>(label);
+    trafficModel.nodes.emplace_back(basicCity);
+    trafficModel.labelToNode.emplace(label, basicCity);
 }
 
-void TrafficModelBuilder::addBasicRoad(std::string inNodeLabel, std::string outNodeLabel, std::string label, float length)
+void TrafficModelBuilder::addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float length)
 {
-    trafficModel.edges.emplace_back(new BasicRoad(*trafficModel.labelToNode[inNodeLabel], *trafficModel.labelToNode[outNodeLabel], label, length));
+    std::shared_ptr<Edge> basicRoad = std::make_shared<BasicRoad>(*trafficModel.labelToNode[inNodeLabel], *trafficModel.labelToNode[outNodeLabel], label, length);
+    trafficModel.edges.emplace_back(basicRoad);
+}
+
+TrafficModel TrafficModelBuilder::build()
+{
+    return trafficModel;
+}
+
+StringCommand::StringCommand(TrafficModelStringDirector& director)
+    : director(director)
+{
+
+}
+
+BasicCityStringCommand::BasicCityStringCommand(TrafficModelStringDirector& director)
+    : StringCommand(director)
+{
+
+}
+
+void BasicCityStringCommand::apply(std::vector<std::string>& args) const
+{
+    director.addBasicCity(args);
+}
+
+BasicRoadStringCommand::BasicRoadStringCommand(TrafficModelStringDirector& director)
+    : StringCommand(director)
+{
+
+}
+
+void BasicRoadStringCommand::apply(std::vector<std::string>& args) const
+{
+    director.addBasicRoad(args);
 }
 
 TrafficModelStringDirector::TrafficModelStringDirector(std::string str)
     : str(str)
 {
-    commander.emplace("BasicCity", &TrafficModelStringDirector::addBasicCity);
-    commander.emplace("BasicRoad", &TrafficModelStringDirector::addBasicRoad);
+    commander.emplace("BasicCity", std::unique_ptr<StringCommand>(new BasicCityStringCommand(*this)));
+    commander.emplace("BasicRoad", std::unique_ptr<StringCommand>(new BasicRoadStringCommand(*this)));
 }
 
 TrafficModel TrafficModelStringDirector::build()
@@ -69,7 +105,7 @@ TrafficModel TrafficModelStringDirector::build()
             case '\n':
                 argumentBuffer.push_back(buffer);
 
-                commander[commandBuffer](argumentBuffer);
+                commander[commandBuffer]->apply(argumentBuffer);
 
                 commandBuffer.clear();
                 argumentBuffer.clear();
@@ -105,7 +141,7 @@ void TrafficModelStringDirector::addBasicCity(std::vector<std::string>& args)
 
 void TrafficModelStringDirector::addBasicRoad(std::vector<std::string>& args)
 {
-    trafficModelBuilder.addBasicRoad(args[0], args[1], args[2], std::stod(args[2]));
+    trafficModelBuilder.addBasicRoad(args[0], args[1], args[2], std::stod(args[3]));
 }
 
 TrafficModelFileDirector::TrafficModelFileDirector(std::string fn)
@@ -118,7 +154,6 @@ TrafficModel TrafficModelFileDirector::build()
 {
     std::ifstream file(fn);
     std::string str(std::istreambuf_iterator<char>{file}, {});
-    std::cout << str << "\n";
     return TrafficModelStringDirector(str).build();
 }
 

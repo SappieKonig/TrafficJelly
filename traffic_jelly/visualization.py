@@ -125,8 +125,8 @@ class Game:
     def update_viewport(self):
         if self.dt != 0:
             self.state.scale *= self.scale_rate ** (self.dt * self.scale_rate_multiplier)
-        self.state.pan_offset_x += self.dt * self.pan_rate_x * self.pan_rate_multiplier * self.state.scale
-        self.state.pan_offset_y += self.dt * self.pan_rate_y * self.pan_rate_multiplier * self.state.scale
+        self.state.pan_offset_x += self.dt * self.pan_rate_x * self.pan_rate_multiplier / self.state.scale
+        self.state.pan_offset_y += self.dt * self.pan_rate_y * self.pan_rate_multiplier / self.state.scale
 
     def update_state(self):
         current_time_step = self.state.time // self.state.delta_time
@@ -203,7 +203,7 @@ class Game:
     def get_offset(self):
         scale = self.state.scale
         return self.get_screen_center() + pygame.Vector2(
-            self.state.pan_offset_x * scale - self.camera.get_x_center(self.state),
-            self.state.pan_offset_y * scale,
+            self.state.pan_offset_x - self.camera.get_x_center(self.state),
+            self.state.pan_offset_y,
         )
 

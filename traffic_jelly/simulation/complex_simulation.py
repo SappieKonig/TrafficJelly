@@ -38,7 +38,7 @@ class Car:
         # every car has a personal target speed
         self.target = np.random.normal(30, 3)  # m/s
         self.target = min(max(self.target, 25), 35)
-        self.speed = 20  # m/s
+        self.speed = 0  # m/s
         self.age = 0  # seconds
         self.distance = 0  # km
         self.lane = 0
@@ -115,7 +115,7 @@ class ComplexSimulation(Simulation):
 
             if car.lane == 0:
                 if not any([other_car.lane == 0 for other_car in cars_in_front]) and \
-                        not any(other_car.lane == 0 and ((car.speed - other_car.speed) > 10 or other_car.speed == 0) for other_car in cars_in_front_far):
+                        not any(other_car.lane == 0 and (car.speed - other_car.speed) > 10 for other_car in cars_in_front_far):
                     car.action = CruiseAction(.2)
                 elif (not any([other_car.lane == 1 for other_car in cars_in_front])
                           and not any([other_car.lane == 1 for other_car in cars_in_back])):
@@ -132,11 +132,11 @@ class ComplexSimulation(Simulation):
             elif car.lane == 1:
                 if (not any([other_car.lane == 0 for other_car in cars_in_front])
                         and not any([other_car.lane == 0 for other_car in cars_in_back])
-                        and not any([other_car.lane == 0 and (car.speed - other_car.speed > 10 or other_car.speed == 0) for other_car in cars_in_front_far])):
+                        and not any([other_car.lane == 0 and car.speed - other_car.speed > 10 for other_car in cars_in_front_far])):
                     switch_lane_action[i] = True
                     car.action = BrakeAction(.5)
                 elif not any([other_car.lane == 1 for other_car in cars_in_front]) and \
-                        not any(other_car.lane == 1 and ((car.speed - other_car.speed) > 10 or other_car.speed == 0) for other_car in cars_in_front_far):
+                        not any(other_car.lane == 1 and (car.speed - other_car.speed) > 10 for other_car in cars_in_front_far):
                     car.action = CruiseAction(.2)
                 else:
                     car.action = BrakeAction(.5)

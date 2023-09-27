@@ -20,7 +20,7 @@ class SimulationCar:
 
 
 def get_random_color() -> tuple[int, int, int]:
-    r, g, b = colorsys.hsv_to_rgb(random.random(), 1, 1)
+    r, g, b = colorsys.hsv_to_rgb(random.random(), 0.5, 1)
     return int(r * 255), int(g * 255), int(b * 255)
 
 
@@ -165,8 +165,8 @@ class Game:
 
         self.marginal_buffer = 100  # m
         self.scale_rate_base = 2  # multiplier per second
+        self.pan_rate_base = 100  # pixels per second
         self.scale_rate_multiplier_base = 2
-        self.pan_rate_base = 100  # pixels
         self.pan_rate_multiplier_base = 4
 
         self.dt = 0
@@ -186,8 +186,8 @@ class Game:
             next_cars={},
         )
 
-    def get_screen_center(self) -> tuple[int, int]:
-        return self.screen.get_rect().center
+    def get_screen_center(self) -> pygame.Vector2:
+        return pygame.Vector2(self.screen.get_rect().center)
 
     def main(self):
         self.loop()
@@ -244,9 +244,13 @@ class Game:
 
     def update_viewport(self):
         if self.dt != 0:
-            self.state.scale *= self.scale_rate ** (self.dt * self.scale_rate_multiplier)
-        self.state.pan_offset_x += self.dt * self.pan_rate_x * self.pan_rate_multiplier * self.state.scale
-        self.state.pan_offset_y += self.dt * self.pan_rate_y * self.pan_rate_multiplier * self.state.scale
+            screen_center = self.get_screen_center()
+            scale_factor = self.scale_rate ** (self.dt * self.scale_rate_multiplier)
+            self.state.scale *= scale_factor
+            self.state.pan_offset_x -= (scale_factor - 1) * screen_center.x / self.state.scale
+            self.state.pan_offset_y -= (scale_factor - 1) * screen_center.y / self.state.scale
+        self.state.pan_offset_x += self.dt * self.pan_rate_x * self.pan_rate_multiplier / self.state.scale
+        self.state.pan_offset_y += self.dt * self.pan_rate_y * self.pan_rate_multiplier / self.state.scale
 
     def update_state(self):
         current_time_step = self.state.time // self.state.delta_time
@@ -297,7 +301,7 @@ class Game:
             y = alpha * next_y + beta * prev_y
 
             car_rect = pygame.rect.Rect(
-                x * scale,
+                (x - CAR_WIDTH * 0.5) * scale,
                 (LANE_WIDTH * (self.lanes - y - 0.5) - CAR_WIDTH * 0.5) * scale,
                 CAR_LENGTH * scale,
                 CAR_WIDTH * scale
@@ -323,7 +327,7 @@ class Game:
     def get_displayed_cars_interval(self):
         screen_rect = self.screen.get_rect()
         max_speed_buffer = self.dt * MAX_SPEED
-        center = -self.get_offset().x + self.get_screen_center()[0] / self.state.scale
+        center = -self.get_offset().x + self.get_screen_center().x / self.state.scale
         radius = (screen_rect.width * 0.5 + max_speed_buffer) / self.state.scale + self.marginal_buffer
         return center - radius, center + radius
 
@@ -331,10 +335,9 @@ class Game:
         return self.get_offset() * self.state.scale
 
     def get_offset(self):
-        scale = self.state.scale
         return self.get_screen_center() + pygame.Vector2(
-            self.state.pan_offset_x * scale - self.camera.get_x_center(self.state),
-            self.state.pan_offset_y * scale,
+            self.state.pan_offset_x - self.camera.get_x_center(self.state),
+            self.state.pan_offset_y,
         )
 
 

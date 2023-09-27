@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import norm
+import random
 
 from .simulation import Simulation
 from traffic_jelly.data_types import GraphicsCar
@@ -76,6 +77,9 @@ class Car:
             y=self.lane,
         )
 
+    def get_margin(self):
+        return 20 + 35 * self.speed / 100
+
 
 class ComplexSimulation(Simulation):
     def __init__(self, length, spawn_prob_per_sec=0.1):
@@ -92,51 +96,44 @@ class ComplexSimulation(Simulation):
             if car.action is not None:
                 continue
             backward_margin = 100
-            forward_margin = 20 + 35 * car.speed / 100
             cars_in_front = []
             j = i - 1  # vehicles are ordered largest distance to smallest
-            while j >= 0 and self.vehicles[j].distance - car.distance < forward_margin:
+            while j >= 0 and self.vehicles[j].distance - car.distance < car.get_margin():
                 cars_in_front.append(self.vehicles[j])
                 j -= 1
+            front_occupied = set(other_car.lane for other_car in cars_in_front)
 
             cars_in_front_far = []
             j = i - 1
-            while j >= 0 and self.vehicles[j].distance - car.distance < forward_margin * 3:
+            while j >= 0 and self.vehicles[j].distance - car.distance < car.get_margin() * 3:
                 cars_in_front_far.append(self.vehicles[j])
                 j -= 1
+            front_snails = set(other_car.lane for other_car in cars_in_front_far if
+                               (car.speed - other_car.speed > 10 or other_car.speed == 0))
 
             cars_in_back = []
             j = i + 1
             while j < len(self.vehicles) and car.distance - self.vehicles[j].distance < backward_margin:
-                pseudo_margin = 20 + 35 * self.vehicles[j].speed / 100
+                pseudo_margin = self.vehicles[j].get_margin()
                 if car.distance - self.vehicles[j].distance < pseudo_margin:
                     cars_in_back.append(self.vehicles[j])
                 j += 1
+            back_occupied = set(other_car.lane for other_car in cars_in_back)
 
             if car.lane == 0:
-                if not any([other_car.lane == 0 for other_car in cars_in_front]) and \
-                        not any(other_car.lane == 0 and (car.speed - other_car.speed) > 10 for other_car in cars_in_front_far):
+                if car.lane not in front_occupied and car.lane not in front_snails:
                     car.action = CruiseAction(.2)
-                elif (not any([other_car.lane == 1 for other_car in cars_in_front])
-                          and not any([other_car.lane == 1 for other_car in cars_in_back])):
+                elif 1 not in front_occupied and 1 not in back_occupied and 1 not in front_snails:
                     switch_lane_action[i] = True
                     car.action = AccelerateAction(.2)
                 else:
                     car.action = BrakeAction(.5)
-                    if any([other_car.lane == car.lane for other_car in cars_in_front]):
-                        first_car_in_front = next((other_car for other_car in cars_in_front if other_car.lane == car.lane))
-                        # when the car in front is driving slowly, shadow the speed (instead of full on braking)
-                        if car.speed < first_car_in_front.speed < 20:
-                            car.speed = first_car_in_front.speed
 
             elif car.lane == 1:
-                if (not any([other_car.lane == 0 for other_car in cars_in_front])
-                        and not any([other_car.lane == 0 for other_car in cars_in_back])
-                        and not any([other_car.lane == 0 and car.speed - other_car.speed > 10 for other_car in cars_in_front_far])):
+                if 0 not in front_occupied and 0 not in back_occupied and 0 not in front_snails:
                     switch_lane_action[i] = True
                     car.action = BrakeAction(.5)
-                elif not any([other_car.lane == 1 for other_car in cars_in_front]) and \
-                        not any(other_car.lane == 1 and (car.speed - other_car.speed) > 10 for other_car in cars_in_front_far):
+                elif 1 not in front_occupied and 1 not in front_snails:
                     car.action = CruiseAction(.2)
                 else:
                     car.action = BrakeAction(.5)
@@ -150,10 +147,11 @@ class ComplexSimulation(Simulation):
             if self.vehicles[i].distance >= self.length:
                 self.time_taken.append(self.vehicles[i].age)
 
-        if np.random.random() < self.spawn_prob and (len(self.vehicles) == 0 or self.vehicles[-1].distance > 0.02):
-            self.vehicles.append(Car())
-            if len(self.vehicles) > 1 and self.vehicles[-2].distance < 0.1:
-                self.vehicles[-1].speed = min(self.vehicles[-2].speed, self.vehicles[-1].speed)
+        if random.random() < self.spawn_prob and (len(self.vehicles) == 0 or self.vehicles[-1].distance > 20):
+            new_car = Car()
+            if len(self.vehicles) != 0 and self.vehicles[-1].distance < 100:
+                new_car.speed = min(self.vehicles[-1].speed, new_car.speed)
+            self.vehicles.append(new_car)
 
         self.vehicles = [car for car in self.vehicles if car.distance < self.length]
 

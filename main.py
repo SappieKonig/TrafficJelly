@@ -25,7 +25,7 @@ def get_random_color() -> tuple[int, int, int]:
 
 
 class Simulation:
-    __dt = 1  # seconds
+    __dt = 0.2  # seconds
     __scale = 1
     __road_length = 1000
     __lane_count = 3
@@ -34,10 +34,10 @@ class Simulation:
         self.__cars = {
             i: SimulationCar(
                 id=i,
-                x=i * 30, v=50, a=0,
+                x=i * 30, v=0, a=10,
                 lane=int(random.random() < 0.4),
                 color=get_random_color()
-            ) for i in range(50)
+            ) for i in range(30)
         }
 
     def get_scale(self):
@@ -48,15 +48,23 @@ class Simulation:
 
     def step_forward(self):
         car_ids_to_delete = []
+        cars_to_add = {}
         for car_id, car in self.__cars.items():
             car.v += car.a * self.__dt
             car.x += car.v * self.__dt
+            if car.x > self.__road_length:
+                car.x %= self.__road_length
+                car.id += len(self.__cars)
+                car.color = get_random_color()
+                cars_to_add[car.id] = car
+                car_ids_to_delete.append(car_id)
             if not 0 <= car.x <= self.__road_length:
                 car_ids_to_delete.append(car_id)
             if random.random() < 0.1:
-                car.lane = 1 - car.lane
+                car.lane = random.randrange(self.__lane_count)
         for car_id in car_ids_to_delete:
             del self.__cars[car_id]
+        self.__cars.update(cars_to_add)
 
     def get_road_length(self):
         return self.__road_length

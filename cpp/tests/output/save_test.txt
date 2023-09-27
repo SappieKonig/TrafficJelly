@@ -1,0 +1,1 @@
+Amsterdam,Utrecht,Delft,A2:Utrecht-Amsterdam/40.000000;A2:Amsterdam-Utrecht/40.000000;N446:Delft-Amsterdam/70.000000;N446:Amsterdam-Delft/70.000000;A12:Utrecht-Delft/70.000000;A12:Delft-Utrecht/70.000000;

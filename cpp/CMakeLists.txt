@@ -19,6 +19,9 @@ add_executable(load_test
     src/action_generator.cpp
     src/action_manager.cpp
     src/action.cpp
+    src/visualizer.cpp
+    src/car_parameters.cpp
+    src/observation.cpp
 )
 target_include_directories(load_test PRIVATE include)
 add_test(load_test load_test)
@@ -34,6 +37,9 @@ add_executable(save_test
     src/action_generator.cpp
     src/action_manager.cpp
     src/action.cpp
+    src/visualizer.cpp
+    src/car_parameters.cpp
+    src/observation.cpp
 )
 target_include_directories(save_test PRIVATE include)
 add_test(save_test save_test)
@@ -49,5 +55,9 @@ add_executable(${PROJECT_NAME}
     src/action_generator.cpp
     src/action_manager.cpp
     src/action.cpp
+    src/visualizer.cpp
+    src/car_parameters.cpp
+    src/observation.cpp
 )
 target_include_directories(${PROJECT_NAME} PRIVATE include)
+

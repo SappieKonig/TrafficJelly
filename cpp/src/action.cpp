@@ -1,14 +1,20 @@
 #include "action.h"
 #include "car.h"
+#include <memory>
 
-Action::Action(Car& actor)
-    : actor(actor)
+Action::Action(std::shared_ptr<CarParameters> params)
+    : params(params)
 {
 
 }
 
-NullAction::NullAction(Car& actor)
-    : Action(actor)
+Action::~Action()
+{
+
+}
+
+NullAction::NullAction(std::shared_ptr<CarParameters> params)
+    : Action(params)
 {
 
 }
@@ -18,19 +24,19 @@ void NullAction::apply(float dt)
 
 }
 
-DriveAction::DriveAction(Car& actor)
-    : Action(actor)
+DriveAction::DriveAction(std::shared_ptr<CarParameters> params)
+    : Action(params)
 {
 
 }
 
 void DriveAction::apply(float dt)
 {
-    actor.x += actor.v * dt;
+    params->x += params->v * dt;
 }
 
-WaitAction::WaitAction(Car& actor)
-    : Action(actor)
+WaitAction::WaitAction(std::shared_ptr<CarParameters> params)
+    : Action(params)
 {
 
 }
@@ -44,19 +50,8 @@ void WaitAction::apply(float dt)
     }
 }
 
-EdgeChoiceAction::EdgeChoiceAction(Car& actor)
-    : Action(actor)
-{
-
-}
-
-void EdgeChoiceAction::apply(float dt)
-{
-
-}
-
-CompositeAction::CompositeAction(Car& actor, std::vector<std::reference_wrapper<Action>> actions)
-    : Action(actor), actions(actions)
+CompositeAction::CompositeAction(std::shared_ptr<CarParameters> params, std::vector<std::reference_wrapper<Action>> actions)
+    : Action(params), actions(actions)
 {
     
 }

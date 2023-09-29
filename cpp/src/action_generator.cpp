@@ -1,23 +1,23 @@
 #include "action_generator.h"
+#include <memory>
 
-ActionGenerator::ActionGenerator(Car& actor, optional_const_reference<Checkpoint> checkpoint)
-    : actor(actor), checkpoint(checkpoint)
+ActionGenerator::ActionGenerator()
 {
 
 }
 
-void ActionGenerator::setCheckpoint(optional_const_reference<Checkpoint> newCheckpoint)
-{
-    checkpoint = newCheckpoint;
-}
-
-BasicActionGenerator::BasicActionGenerator(Car& actor, optional_const_reference<Checkpoint> checkpoint)
-    : ActionGenerator(actor, checkpoint)
+ActionGenerator::~ActionGenerator()
 {
 
 }
 
-std::unique_ptr<Action> BasicActionGenerator::generateAction(Observation& observation)
+BasicActionGenerator::BasicActionGenerator(std::shared_ptr<CarParameters> params)
+    : params(params)
 {
-    return std::unique_ptr<Action>(new DriveAction(actor));
+
+}
+
+std::unique_ptr<Action> BasicActionGenerator::generateAction(Observation const& observation)
+{
+    return std::make_unique<DriveAction>(params);
 }

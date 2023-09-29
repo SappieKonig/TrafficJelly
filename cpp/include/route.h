@@ -1,11 +1,9 @@
 #ifndef ROUTE_H
 #define ROUTE_H
 
+#include <random>
 #include <vector>
-
-struct Car;
-struct Node;
-struct Edge;
+#include "utils.h"
 
 /*
  * This is a checkpoint for route planners to aim at and drive strategies to respond to.
@@ -13,10 +11,10 @@ struct Edge;
 struct Checkpoint
 {
     Node const& node;
-    Edge const& edgeToNode;
+    Edge& edgeToNode; // THIS IS A VEEEEERY UGLY SNEAKY WORKAROUND FOR TRANSFERRING NODES. TODO: FIX.
     float const waitDurationBeforeEdge;
 
-    Checkpoint(Node const& node, Edge const& edgeToNode, float const waitDurationBeforeEdge);
+    Checkpoint(Node const& node, Edge& edgeToNode, float const waitDurationBeforeEdge);
 };
 
 /*
@@ -25,7 +23,26 @@ struct Checkpoint
  */
 struct Route
 {
-    std::vector<Checkpoint> checkpoints; // Maybe also how long to spend in a city.
+    std::vector<Checkpoint> checkpoints;
+    void show();
+    std::string toString() const;
 };
+
+/*
+ * This is a sampler of routes for cars to follow.
+ */
+class RouteSampler
+{
+private:
+    std::random_device device;
+    std::default_random_engine generator;
+    std::vector<Route>& routes;
+
+public:
+    RouteSampler(std::vector<Route>& routes, std::random_device& device);
+    Route& select();
+    void showRoutes();
+};
+
 
 #endif

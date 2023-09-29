@@ -2,12 +2,14 @@
 #define NODE_H
 
 #include <list>
+#include <memory>
 #include <vector>
 #include <string>
 
 #include "utils.h"
 #include "car.h"
 #include "edge.h"
+#include "visualizer.h"
 
 /*
  * This is a node for the internal graph of TrafficModel.
@@ -27,20 +29,30 @@ protected:
 
 public:
     Node(std::string label);
-    virtual ~Node() = default;
-    virtual void step(float dt) = 0; // To update the car positions, or durations before transferring
+    virtual ~Node();
+    virtual void initialize() = 0;
+    virtual void step(float dt, std::shared_ptr<Visualizer> visualizer) = 0; // To update the car positions, or durations before transferring
+    virtual void spawnCar() = 0; // Does not make sense for non-cities
     virtual std::string toString() const = 0;
     std::string getLabel() const;
-    void addCar(std::unique_ptr<Car>&& car);
+    void enterCar(std::unique_ptr<Car>&& car);
 
     friend Edge::Edge(Node& inNode, Node& outNode, std::string label); // Ugly, I know
 };
 
+/*
+ * This is a basic city node that only holds and transfers nodes.
+ */
 class BasicCity : public Node
 {
+private:
+    BasicCarFactory carFactory; // Factories do not exist in crossroads, so it makes sense to store the factory locally.
+
 public:
-    BasicCity(std::string label);
-    void step(float dt) override;
+    BasicCity(std::string label, std::vector<Route>& routes, std::random_device& device);
+    void initialize() override;
+    void step(float dt, std::shared_ptr<Visualizer> visualizer) override;
+    void spawnCar() override;
     std::string toString() const override;
 };
 

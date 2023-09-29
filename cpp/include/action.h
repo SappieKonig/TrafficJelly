@@ -1,8 +1,10 @@
 #ifndef ACTION_H
 #define ACTION_H
 
+#include <memory>
 #include <vector>
 
+#include "car_parameters.h"
 #include "utils.h"
 
 /*
@@ -13,11 +15,11 @@
 class Action
 {
 protected:
-    Car& actor;
+    std::shared_ptr<CarParameters> params;
 
 public:
-    Action(Car& actor);
-    virtual ~Action() = default;
+    Action(std::shared_ptr<CarParameters> params);
+    virtual ~Action();
     virtual void apply(float dt) = 0;
 };
 
@@ -27,7 +29,7 @@ public:
 class NullAction : public Action
 {
 public:
-    NullAction(Car& actor);
+    NullAction(std::shared_ptr<CarParameters> params);
     void apply(float dt) override;
 };
 
@@ -37,7 +39,7 @@ public:
 class DriveAction : public Action
 {
 public:
-    DriveAction(Car& actor);
+    DriveAction(std::shared_ptr<CarParameters> params);
     void apply(float dt) override;
 };
 
@@ -51,17 +53,7 @@ private:
     float age = 0;
 
 public:
-    WaitAction(Car& duration);
-    void apply(float dt) override;
-};
-
-/*
- * This action transfers the car from a node to an edge.
- */
-class EdgeChoiceAction : public Action
-{
-public:
-    EdgeChoiceAction(Car& actor);
+    WaitAction(std::shared_ptr<CarParameters> params);
     void apply(float dt) override;
 };
 
@@ -74,7 +66,7 @@ private:
     std::vector<std::reference_wrapper<Action>> actions;
 
 public:
-    CompositeAction(Car& actor, std::vector<std::reference_wrapper<Action>> actions);
+    CompositeAction(std::shared_ptr<CarParameters> params, std::vector<std::reference_wrapper<Action>> actions);
     void apply(float dt) override;
 };
 

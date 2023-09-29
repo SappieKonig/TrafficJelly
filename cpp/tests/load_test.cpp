@@ -7,6 +7,8 @@ int main()
 {
     float dt = 0.1f;
     TrafficModelFileDirector director("tests/input/load_test.txt");
-    director.build().display();
+    TrafficModel trafficModel = director.build();
+    trafficModel.display();
+    trafficModel.showRoutes();
     return 0;
 }

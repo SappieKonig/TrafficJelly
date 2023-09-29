@@ -4,3 +4,7 @@ BasicCity:C
 BasicCity:D
 BasicRoad:AB,A,B,2.1
 BasicRoad:BC,B,C,4.3
+RouteTimes:1,2
+RouteEdges:AB,BC
+RouteNodes:B,C
+Route:

@@ -3,6 +3,7 @@
 
 #include "route.h"
 #include "utils.h"
+#include <memory>
 
 /*
  * This is a route planner interface for the choice that a car has to make, when exiting a node.
@@ -11,8 +12,9 @@
 class RoutePlanner
 {
 public:
-    virtual ~RoutePlanner() = default;
-    virtual optional_const_reference<Checkpoint> nextCheckpoint() = 0;
+    virtual ~RoutePlanner();
+    virtual std::shared_ptr<Checkpoint> nextCheckpoint() = 0;
+    virtual void showRoute() = 0;
 };
 
 /*
@@ -23,12 +25,13 @@ public:
 class BasicRoutePlanner : public RoutePlanner
 {
 private:
-    Route const& route; // Maybe extend to hold multiple routes, or allow for perturbations.
-    int checkpointIndex;
+    Route& route; // Maybe extend to hold multiple routes, or allow for perturbations.
+    int checkpointIndex = 0;
 
 public:
-    BasicRoutePlanner(Route const& route);
-    optional_const_reference<Checkpoint> nextCheckpoint() = 0;
+    BasicRoutePlanner(Route& route);
+    std::shared_ptr<Checkpoint> nextCheckpoint() override;
+    void showRoute() override;
 };
 
 

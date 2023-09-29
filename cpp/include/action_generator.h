@@ -5,32 +5,31 @@
 #include "route.h"
 #include "action.h"
 #include "observation.h"
+#include "car_parameters.h"
 
 #include <memory>
 
 /*
- * This is an action generator abstract base class to generate actions for a car to take.
- * This is required when cars are out of actions, or must process observations.
+ * This is an action generator interface to generate actions for a car to take.
+ * This is required every time step in the processing of observations.
+ * The action decision is based only on the car parameters (including the target checkpoint) and the observation.
  */
 class ActionGenerator
 {
-protected:
-    optional_const_reference<Checkpoint> checkpoint;
-    Car& actor;
-
 public:
-    ActionGenerator(Car& actor, optional_const_reference<Checkpoint> checkpoint);
-    virtual ~ActionGenerator() = default;
-    virtual std::unique_ptr<Action> generateAction(Observation& observation) = 0;
-    void setCheckpoint(optional_const_reference<Checkpoint> checkpoint);
+    ActionGenerator();
+    virtual ~ActionGenerator();
+    virtual std::unique_ptr<Action> generateAction(Observation const& observation) = 0;
 };
 
 class BasicActionGenerator : public ActionGenerator
 {
-public:
-    BasicActionGenerator(Car& actor, optional_const_reference<Checkpoint> checkpoint);
-    std::unique_ptr<Action> generateAction(Observation& observation) override;
-};
+private:
+    std::shared_ptr<CarParameters> params;
 
+public:
+    BasicActionGenerator(std::shared_ptr<CarParameters> params);
+    std::unique_ptr<Action> generateAction(Observation const& observation) override;
+};
 
 #endif

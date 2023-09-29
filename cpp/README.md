@@ -1,0 +1,18 @@
+### Todo:
+- [x] Save/load routes (in progress)
+- [ ] Route planner activation in cars
+- [ ] Prototype action generator
+- [x] Better initialization
+- [ ] Complex rulesets for action generator
+    - [ ] 2 second rule.
+- [ ] Complex traffic structures
+    - [ ] Merging
+    - [ ] Crossroads
+    - [ ] Lanes
+- [ ] Visualization integration
+    - [ ] Pybind11 adapter
+- [ ] Return of the const.
+- [ ] Route continuity constraint: route of car depends on initialization.
+- [ ] Flexible spawning.
+    - [x] trafficModel.spawnAt(label)
+    - [ ] Something more automatic, probably best to just have a better factory or something.

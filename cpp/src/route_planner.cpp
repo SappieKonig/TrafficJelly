@@ -1,15 +1,25 @@
 #include "route_planner.h"
+#include "node.h"
 
-BasicRoutePlanner::BasicRoutePlanner(Route const& route)
+RoutePlanner::~RoutePlanner()
+{
+
+}
+
+BasicRoutePlanner::BasicRoutePlanner(Route& route)
     : route(route)
 {
 
 }
 
-std::optional<std::reference_wrapper<Checkpoint const>> BasicRoutePlanner::nextCheckpoint()
+std::shared_ptr<Checkpoint> BasicRoutePlanner::nextCheckpoint()
 {
-    std::optional<std::reference_wrapper<Checkpoint const>> nextEdge = checkpointIndex < route.checkpoints.size() ? std::optional<std::reference_wrapper<Checkpoint const>>(route.checkpoints[checkpointIndex]) : std::nullopt;
+    std::shared_ptr<Checkpoint> nextCheckpoint = checkpointIndex < route.checkpoints.size() ? std::make_unique<Checkpoint>(route.checkpoints[checkpointIndex]) : nullptr;
     checkpointIndex++;
-    return nextEdge;
+    return nextCheckpoint;
 }
 
+void BasicRoutePlanner::showRoute()
+{
+    route.show();
+}

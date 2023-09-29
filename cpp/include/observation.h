@@ -3,7 +3,8 @@
 
 struct Observation
 {
-    
+    bool isNode;
+    Observation(bool isNode);
 };
 
 #endif

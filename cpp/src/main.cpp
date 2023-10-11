@@ -1,7 +1,10 @@
 #include <fstream>
 #include <iostream>
 
+#include "edge/basic_road/basic_road.h"
 #include "traffic_model.h"
+#include "node.h"
+#include "car.h"
 
 int main()
 {
@@ -17,14 +20,21 @@ int main()
 //  routes += "x";
 //  std::cout << b.routes << "\n";
 
-    float dt = 0.1f;
-    TrafficModelFileDirector director("tests/input/load_test.txt");
+    float dt = 0.2f;
+//    Node inNode = {"inNode"};
+//    Node outNode = {"outNode"};
+//    BasicRoad road = {inNode, outNode, "road", 1000, 1};
+//    std::unique_ptr<Car> car = std::make_unique<Car>();
+//    road.enterCar(std::move(car));
+//    road.step(dt);
+
+    TrafficModelFileDirector director("../tests/input/load_test.txt");
     TrafficModel trafficModel = director.build();
-    trafficModel.showRoutes();
+//    trafficModel.showRoutes();
     trafficModel.display();
-    trafficModel.spawnAt("A");
-    trafficModel.step(dt);
-    trafficModel.step(dt);
-    trafficModel.visualize();
-    return 0;
+//    trafficModel.spawnAt("A");
+//    trafficModel.step(dt);
+//    trafficModel.step(dt);
+//    trafficModel.visualize();
+//    return 0;
 }

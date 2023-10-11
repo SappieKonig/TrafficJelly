@@ -1,63 +1,25 @@
-cmake_minimum_required(VERSION 2.27.4)
+cmake_minimum_required(VERSION 3.23)
 project(TrafficJelly)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+set(CMAKE_CXX_STANDARD 17)
 
-enable_testing()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
-add_executable(load_test
-    tests/load_test.cpp
-    src/traffic_model.cpp
-    src/node.cpp
-    src/edge.cpp
-    src/car.cpp
-    src/route_planner.cpp
-    src/route.cpp
-    src/action_generator.cpp
-    src/action_manager.cpp
-    src/action.cpp
-    src/visualizer.cpp
-    src/car_parameters.cpp
-    src/observation.cpp
-)
-target_include_directories(load_test PRIVATE include)
-add_test(load_test load_test)
+#file(GLOB_RECURSE SOURCES "src/*.cpp")
+set(SOURCES
+        src/main.cpp
+        src/action.cpp
+        src/action.cpp
+        src/node.cpp
+        src/car.cpp
+        src/traffic_model.cpp
+        src/edge/edge.cpp
+        src/edge/basic_road/basic_road.cpp
+        src/edge/basic_road/basic_road_dynamics.cpp
+        src/edge/basic_road/basic_road_observation.cpp)
 
-add_executable(save_test
-    tests/save_test.cpp
-    src/traffic_model.cpp
-    src/node.cpp
-    src/edge.cpp
-    src/car.cpp
-    src/route_planner.cpp
-    src/route.cpp
-    src/action_generator.cpp
-    src/action_manager.cpp
-    src/action.cpp
-    src/visualizer.cpp
-    src/car_parameters.cpp
-    src/observation.cpp
-)
-target_include_directories(save_test PRIVATE include)
-add_test(save_test save_test)
+# Define the executable and its source files
+add_executable(${PROJECT_NAME} ${SOURCES})
 
-add_executable(${PROJECT_NAME}
-    src/main.cpp
-    src/traffic_model.cpp
-    src/node.cpp
-    src/edge.cpp
-    src/car.cpp
-    src/route_planner.cpp
-    src/route.cpp
-    src/action_generator.cpp
-    src/action_manager.cpp
-    src/action.cpp
-    src/visualizer.cpp
-    src/car_parameters.cpp
-    src/observation.cpp
-)
-target_include_directories(${PROJECT_NAME} PRIVATE include)
-
+# Include directories
+include_directories(include)

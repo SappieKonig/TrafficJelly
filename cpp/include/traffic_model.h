@@ -12,7 +12,7 @@
 #include "utils.h"
 #include "car.h"
 #include "node.h"
-#include "edge.h"
+#include "edge/edge.h"
 #include "visualizer.h"
 
 class TrafficModelBuilder;
@@ -42,9 +42,9 @@ public:
     // Model usage and interpretation
     void step(float dt);
     void display() const; // Only reasonably used, if small graph
-    void showRoutes();
-    void spawnAt(std::string label); // Does not make sense for non-cities
-    void visualize(); // Intended ONLY for accessing the BasicVisualizer.
+//    void showRoutes();
+//    void spawnAt(std::string label); // Does not make sense for non-cities
+//    void visualize(); // Intended ONLY for accessing the BasicVisualizer.
 
     friend TrafficModelBuilder;
 };
@@ -61,13 +61,16 @@ private:
     std::random_device device;
 
 public:
-    void addBasicCity(std::string label); // Not safe, if existent label
-    void addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float length); // Not safe, if existent label
-    void addRoute(std::vector<std::string>& nodesAlongRoute, std::vector<std::string>& edgesAlongRoute, std::vector<float>& waitingTimesAlongRoute);
-    void addRoute(std::vector<std::string>&& nodesAlongRoute, std::vector<std::string>&& edgesAlongRoute, std::vector<float>&& waitingTimesAlongRoute);
-    TrafficModel& build();
+//    void addBasicCity(std::string label); // Not safe, if existent label
+//    void addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float length); // Not safe, if existent label
+//    void addRoute(std::vector<std::string>& nodesAlongRoute, std::vector<std::string>& edgesAlongRoute, std::vector<float>& waitingTimesAlongRoute);
+//    void addRoute(std::vector<std::string>&& nodesAlongRoute, std::vector<std::string>&& edgesAlongRoute, std::vector<float>&& waitingTimesAlongRoute);
+    void addNode(std::string label);
+    void addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float length, int nLanes);
+    TrafficModel getModel() { return trafficModel; }
+//    TrafficModel& build();
 
-    void save(std::string fn) const;
+//    void save(std::string fn) const;
 };
 
 class TrafficModelStringDirector;
@@ -88,12 +91,12 @@ public:
 /*
  * This string command builds a basic city.
  */
-class BasicCityStringCommand : public StringCommand
-{
-public:
-    BasicCityStringCommand(TrafficModelStringDirector& director);
-    void apply(std::vector<std::string>& args) const override;
-};
+//class BasicCityStringCommand : public StringCommand
+//{
+//public:
+//    BasicCityStringCommand(TrafficModelStringDirector& director);
+//    void apply(std::vector<std::string>& args) const override;
+//};
 
 /*
  * This string command builds a basic road.
@@ -105,45 +108,52 @@ public:
     void apply(std::vector<std::string>& args) const override;
 };
 
+class NodeStringCommand : public StringCommand
+{
+public:
+    NodeStringCommand(TrafficModelStringDirector& director);
+    void apply(std::vector<std::string>& args) const override;
+};
+
 /*
  * This string command caches waitingTimesAlongRoute for the AddRoute command.
  */
-class RouteTimesStringCommand : public StringCommand
-{
-public:
-    RouteTimesStringCommand(TrafficModelStringDirector& director);
-    void apply(std::vector<std::string>& args) const override;
-};
-
-/*
- * This string command caches nodesAlongRoute for the AddRoute command.
- */
-class RouteNodesStringCommand : public StringCommand
-{
-public:
-    RouteNodesStringCommand(TrafficModelStringDirector& director);
-    void apply(std::vector<std::string>& args) const override;
-};
-
-/*
- * This string command caches edgesAlongRoute for the AddRoute command.
- */
-class RouteEdgesStringCommand : public StringCommand
-{
-public:
-    RouteEdgesStringCommand(TrafficModelStringDirector& director);
-    void apply(std::vector<std::string>& args) const override;
-};
-
-/*
- * This string command builds a route from cached components.
- */
-class RouteStringCommand : public StringCommand
-{
-public:
-    RouteStringCommand(TrafficModelStringDirector& director);
-    void apply(std::vector<std::string>& args) const override;
-};
+//class RouteTimesStringCommand : public StringCommand
+//{
+//public:
+//    RouteTimesStringCommand(TrafficModelStringDirector& director);
+//    void apply(std::vector<std::string>& args) const override;
+//};
+//
+///*
+// * This string command caches nodesAlongRoute for the AddRoute command.
+// */
+//class RouteNodesStringCommand : public StringCommand
+//{
+//public:
+//    RouteNodesStringCommand(TrafficModelStringDirector& director);
+//    void apply(std::vector<std::string>& args) const override;
+//};
+//
+///*
+// * This string command caches edgesAlongRoute for the AddRoute command.
+// */
+//class RouteEdgesStringCommand : public StringCommand
+//{
+//public:
+//    RouteEdgesStringCommand(TrafficModelStringDirector& director);
+//    void apply(std::vector<std::string>& args) const override;
+//};
+//
+///*
+// * This string command builds a route from cached components.
+// */
+//class RouteStringCommand : public StringCommand
+//{
+//public:
+//    RouteStringCommand(TrafficModelStringDirector& director);
+//    void apply(std::vector<std::string>& args) const override;
+//};
 
 /*
  * This traffic model string director allows for the traffic model to be constructed from a string.
@@ -160,17 +170,19 @@ private:
 
 public:
     TrafficModelStringDirector(std::string fn);
-    TrafficModel& build();
-    void addBasicCity(std::vector<std::string>& args); // Not safe, if existent label. Also, probably should add argument object for more clarity of the parameters in code. Is getting tedious though.
+    TrafficModel build();
+    void addNode(std::vector<std::string>& args);
+//    void addBasicCity(std::vector<std::string>& args); // Not safe, if existent label. Also, probably should add argument object for more clarity of the parameters in code. Is getting tedious though.
     void addBasicRoad(std::vector<std::string>& args);
-    void setWaitingTimesAlongRoute(std::vector<std::string>& args);
-    void setNodesAlongRoute(std::vector<std::string>& args);
-    void setEdgesAlongRoute(std::vector<std::string>& args);
-    void addRoute();
+//    void setWaitingTimesAlongRoute(std::vector<std::string>& args);
+//    void setNodesAlongRoute(std::vector<std::string>& args);
+//    void setEdgesAlongRoute(std::vector<std::string>& args);
+//    void addRoute();
 
     // Add string commands as friends, because I am too stupid to solve the encapsulation issues.
-    friend BasicCityStringCommand;
+//    friend BasicCityStringCommand;
     friend BasicRoadStringCommand;
+    friend NodeStringCommand;
 };
 
 /*
@@ -183,7 +195,7 @@ private:
 
 public:
     TrafficModelFileDirector(std::string fn);
-    TrafficModel& build();
+    TrafficModel build();
 };
 
 #endif

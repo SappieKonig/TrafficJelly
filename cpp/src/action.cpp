@@ -2,64 +2,32 @@
 #include "car.h"
 #include <memory>
 
-Action::Action(std::shared_ptr<CarParameters> params)
-    : params(params)
-{
+Action::Action() = default;
+
+void CruiseAction::apply(Car& ego, float dt) {
 
 }
 
-Action::~Action()
-{
-
+void HardBrakeAction::apply(Car& ego, float dt) {
+    ego.hardBrake(dt);
 }
 
-NullAction::NullAction(std::shared_ptr<CarParameters> params)
-    : Action(params)
-{
-
+void ToLeftLaneAction::apply(Car& ego, float dt) {
+    ego.toLeftLane();
 }
 
-void NullAction::apply(float dt)
-{
-
+void ToRightLaneAction::apply(Car& ego, float dt) {
+    ego.toRightLane();
 }
 
-DriveAction::DriveAction(std::shared_ptr<CarParameters> params)
-    : Action(params)
-{
-
-}
-
-void DriveAction::apply(float dt)
-{
-    params->x += params->v * dt;
-}
-
-WaitAction::WaitAction(std::shared_ptr<CarParameters> params)
-    : Action(params)
-{
-
-}
-
-void WaitAction::apply(float dt)
-{
-    age += dt;
-    if (age >= duration)
-    {
-        delete this;
+void CompositeAction::apply(Car& ego, float dt) {
+    for (auto &action : actions) {
+        action->apply(ego, dt);
     }
 }
 
-CompositeAction::CompositeAction(std::shared_ptr<CarParameters> params, std::vector<std::reference_wrapper<Action>> actions)
-    : Action(params), actions(actions)
-{
-    
+CompositeAction::CompositeAction(std::vector<std::unique_ptr<Action>> actions) {
+    this->actions = std::move(actions);
 }
 
-void CompositeAction::apply(float dt)
-{
-    for (Action& action : actions)
-    {
-        action.apply(dt);
-    }
-}
+

@@ -6,9 +6,10 @@
 #include <memory>
 #include <vector>
 #include <string>
+#include <iostream>
 
 #include "utils.h"
-#include "observation.h"
+//#include "observation.h"
 #include "visualizer.h"
 
 /*
@@ -20,7 +21,7 @@ class Edge
 {
 protected:
     // To keep track of every car in the driving order.
-    std::deque<std::unique_ptr<Car>> cars;
+    std::list<std::unique_ptr<Car>> cars;
 
     Node& inNode;
     Node& outNode;
@@ -30,24 +31,19 @@ public:
     Edge(Node& inNode, Node& outNode, std::string label);
     virtual ~Edge();
     virtual void initialize() = 0;
-    virtual void step(float dt, std::shared_ptr<Visualizer> visualizer) = 0; // To update the car positions in the edge. The transfer between edges is left to the model.
+    virtual void setActions() = 0;
     virtual std::string toString() const = 0;
     virtual void enterCar(std::unique_ptr<Car>&& car) = 0;
+    void sortCars();
+    void updateCars(float dt);
+    void step(float dt) {
+        setActions();
+        updateCars(dt);
+        sortCars();
+    }
     std::string getLabel() const;
 };
 
-class BasicRoad : public Edge
-{
-private:
-    float const length = 0;
 
-public:
-    BasicRoad(Node& inNode, Node& outNode, std::string label, float length);
-    void initialize() override;
-    void step(float dt, std::shared_ptr<Visualizer> visualizer) override;
-    std::string toString() const override;
-    void enterCar(std::unique_ptr<Car>&& car) override;
-
-};
 
 #endif

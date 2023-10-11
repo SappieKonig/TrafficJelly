@@ -4,8 +4,9 @@
 #include <memory>
 #include <vector>
 
-#include "car_parameters.h"
 #include "utils.h"
+#include "car.h"
+
 
 /*
  * This is an action abstract base class for cars to take.
@@ -14,47 +15,34 @@
  */
 class Action
 {
-protected:
-    std::shared_ptr<CarParameters> params;
-
 public:
-    Action(std::shared_ptr<CarParameters> params);
-    virtual ~Action();
-    virtual void apply(float dt) = 0;
+    Action();
+    virtual void apply(Car& ego, float dt) = 0;
+    virtual ~Action() = default;
 };
 
-/*
- * This action does nothing.
- */
-class NullAction : public Action
+class CruiseAction : public Action
 {
 public:
-    NullAction(std::shared_ptr<CarParameters> params);
-    void apply(float dt) override;
+    void apply(Car& ego, float dt) override;
 };
 
-/*
- * This action moves the car by its velocity over a time step.
- */
-class DriveAction : public Action
+class HardBrakeAction : public Action
 {
 public:
-    DriveAction(std::shared_ptr<CarParameters> params);
-    void apply(float dt) override;
+    void apply(Car& ego, float dt) override;
 };
 
-/*
- * This action lets the car wait for a given duration.
- */
-class WaitAction : public Action
+class ToLeftLaneAction : public Action
 {
-private:
-    float duration;
-    float age = 0;
-
 public:
-    WaitAction(std::shared_ptr<CarParameters> params);
-    void apply(float dt) override;
+    void apply(Car& ego, float dt) override;
+};
+
+class ToRightLaneAction : public Action
+{
+public:
+    void apply(Car& ego, float dt) override;
 };
 
 /*
@@ -63,11 +51,11 @@ public:
 class CompositeAction : public Action
 {
 private:
-    std::vector<std::reference_wrapper<Action>> actions;
+    std::vector<std::unique_ptr<Action>> actions;
 
 public:
-    CompositeAction(std::shared_ptr<CarParameters> params, std::vector<std::reference_wrapper<Action>> actions);
-    void apply(float dt) override;
+    CompositeAction(std::vector<std::unique_ptr<Action>> actions);
+    void apply(Car& ego, float dt) override;
 };
 
 #endif

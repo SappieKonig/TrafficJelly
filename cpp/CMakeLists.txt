@@ -10,7 +10,7 @@ set(SOURCES
         src/main.cpp
         src/action.cpp
         src/action.cpp
-        src/node.cpp
+        src/node/node.cpp
         src/car.cpp
         src/traffic_model.cpp
         src/edge/edge.cpp

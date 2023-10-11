@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <random>
 
 #include "utils.h"
 #include "car.h"
@@ -22,17 +23,17 @@
 class Node {
 private:
     std::string const label;
+    std::mt19937 rng;
 
 public:
     Node(std::string label);
     std::vector<std::reference_wrapper<Edge>> inEdges; // ref
     std::vector<std::reference_wrapper<Edge>> outEdges;
-    std::string getLabel() { std::cout << "whoops" << std::endl; return label; }
-    void step(float dt) {
-        for (auto& edge : inEdges) {
-            edge.get().step(dt);
-        }
-    }
+    std::vector<std::unique_ptr<Car>> storedCars;
+    void collectCars();
+    void distributeCars();
+    std::string getLabel() { return label; }
+    void step(float dt) {}
 };
 
 //class Node

@@ -5,7 +5,12 @@
 Action::Action() = default;
 
 void CruiseAction::apply(Car& ego, float dt) {
-
+    float target = ego.getTarget();
+    if (ego.getV() < target) {
+        ego.accelerate(dt);
+    } else if (ego.getV() > target) {
+        ego.softBrake(dt);
+    }
 }
 
 void HardBrakeAction::apply(Car& ego, float dt) {

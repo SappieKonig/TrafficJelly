@@ -19,6 +19,18 @@ void TrafficModel::step(float dt)
     {
         node->step(dt);
     }
+    for (auto& edge : edges)
+    {
+        edge->step(dt);
+    }
+}
+
+void TrafficModel::transferCars() {
+    for (auto& node : nodes)
+    {
+        node->collectCars();
+        node->distributeCars();
+    }
 }
 
 void TrafficModel::display() const
@@ -36,37 +48,17 @@ void TrafficModel::display() const
     }
 }
 
-//void TrafficModel::showRoutes()
-//{
-//    for (int i = 0; i < routes.size(); i++)
-//    {
-//        std::cout << "Route " << i+1 << ":\n";
-//        routes[i].show();
-//    }
-//}
-
-//void TrafficModel::spawnAt(std::string label)
-//{
-//    labelToNode[label]->spawnCar();
-//}
-
-//void TrafficModel::visualize()
-//{
-//    std::dynamic_pointer_cast<BasicVisualizer>(visualizer)->render();
-//}
-
 void TrafficModelBuilder::addNode(std::string label) {
     std::shared_ptr<Node> node = std::make_shared<Node>(label);
     trafficModel.nodes.emplace_back(node);
     trafficModel.labelToNode[label] = node;
-    std::cout << trafficModel.nodes[0]->getLabel() << "\n";
 }
 
-void TrafficModelBuilder::addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float length, int nLanes)
+void TrafficModelBuilder::addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float length, float speedLimit, int nLanes)
 {
     std::shared_ptr<Node> inNode = trafficModel.labelToNode[inNodeLabel];
     std::shared_ptr<Node> outNode = trafficModel.labelToNode[outNodeLabel];
-    std::shared_ptr<Edge> edge = std::make_shared<BasicRoad>(*inNode, *outNode, label, length, nLanes);
+    std::shared_ptr<Edge> edge = std::make_shared<BasicRoad>(*inNode, *outNode, label, length, speedLimit, nLanes);
     trafficModel.edges.emplace_back(edge);
     trafficModel.labelToEdge[label] = edge;
 }
@@ -76,49 +68,6 @@ void TrafficModelBuilder::addBasicRoad(std::string label, std::string inNodeLabe
 //    std::shared_ptr<Node> basicCity = std::make_shared<BasicCity>(label, trafficModel.routes, device);
 //    trafficModel.nodes.emplace_back(basicCity);
 //    trafficModel.labelToNode.emplace(label, basicCity);
-//}
-//
-//void TrafficModelBuilder::addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float length)
-//{
-//    std::shared_ptr<Edge> basicRoad = std::make_shared<BasicRoad>(*trafficModel.labelToNode[inNodeLabel], *trafficModel.labelToNode[outNodeLabel], label, length);
-//    trafficModel.edges.emplace_back(basicRoad);
-//    trafficModel.labelToEdge.emplace(label, basicRoad);
-//}
-//
-//void TrafficModelBuilder::addRoute(std::vector<std::string>& nodesAlongRoute, std::vector<std::string>& edgesAlongRoute, std::vector<float>& waitingTimesAlongRoute)
-//{
-//    Route route;
-//    int routeLength = edgesAlongRoute.size();
-//    for (int i = 0; i < routeLength; i++)
-//    {
-//        route.checkpoints.emplace_back(*trafficModel.labelToNode[nodesAlongRoute[i]], *trafficModel.labelToEdge[edgesAlongRoute[i]], waitingTimesAlongRoute[i]);
-//    }
-//    trafficModel.routes.push_back(std::move(route));
-//}
-//
-//void TrafficModelBuilder::addRoute(std::vector<std::string>&& nodesAlongRoute, std::vector<std::string>&& edgesAlongRoute, std::vector<float>&& waitingTimesAlongRoute)
-//{
-//    Route route;
-//    int routeLength = edgesAlongRoute.size();
-//    for (int i = 0; i < routeLength; i++)
-//    {
-//        route.checkpoints.emplace_back(*trafficModel.labelToNode[nodesAlongRoute[i]], *trafficModel.labelToEdge[edgesAlongRoute[i]], waitingTimesAlongRoute[i]);
-//    }
-//    trafficModel.routes.push_back(std::move(route));
-//}
-
-//TrafficModel& TrafficModelBuilder::build()
-//{
-//    // Initialize car (cresd naar kenzoooooooooooooooooooooooooo>
-//    for (std::shared_ptr<Node> node : trafficModel.nodes)
-//    {
-//        node->initialize();
-//    }
-//    for (std::shared_ptr<Edge> edge : trafficModel.edges)
-//    {
-//        edge->initialize();
-//    }
-//    return trafficModel;
 //}
 
 StringCommand::StringCommand(TrafficModelStringDirector& director)
@@ -160,60 +109,12 @@ void NodeStringCommand::apply(std::vector<std::string>& args) const
     director.addNode(args);
 }
 
-//RouteTimesStringCommand::RouteTimesStringCommand(TrafficModelStringDirector& director)
-//    : StringCommand(director)
-//{
-//
-//}
-//
-//void RouteTimesStringCommand::apply(std::vector<std::string>& args) const
-//{
-//    director.setWaitingTimesAlongRoute(args);
-//}
-//
-//RouteNodesStringCommand::RouteNodesStringCommand(TrafficModelStringDirector& director)
-//    : StringCommand(director)
-//{
-//
-//}
-//
-//void RouteNodesStringCommand::apply(std::vector<std::string>& args) const
-//{
-//    director.setNodesAlongRoute(args);
-//}
-//
-//RouteEdgesStringCommand::RouteEdgesStringCommand(TrafficModelStringDirector& director)
-//    : StringCommand(director)
-//{
-//
-//}
-//
-//void RouteEdgesStringCommand::apply(std::vector<std::string>& args) const
-//{
-//    director.setEdgesAlongRoute(args);
-//}
-//
-//RouteStringCommand::RouteStringCommand(TrafficModelStringDirector& director)
-//    : StringCommand(director)
-//{
-//
-//}
-//
-//void RouteStringCommand::apply(std::vector<std::string>& args) const
-//{
-//    director.addRoute();
-//}
-
 TrafficModelStringDirector::TrafficModelStringDirector(std::string str)
     : str(str)
 {
 //    commander.emplace("BasicCity", std::unique_ptr<StringCommand>(new BasicCityStringCommand(*this)));
     commander.emplace("BasicRoad", std::unique_ptr<StringCommand>(new BasicRoadStringCommand(*this)));
     commander.emplace("Node", std::unique_ptr<StringCommand>(new NodeStringCommand(*this)));
-//    commander.emplace("RouteTimes", std::unique_ptr<StringCommand>(new RouteTimesStringCommand(*this)));
-//    commander.emplace("RouteNodes", std::unique_ptr<StringCommand>(new RouteNodesStringCommand(*this)));
-//    commander.emplace("RouteEdges", std::unique_ptr<StringCommand>(new RouteEdgesStringCommand(*this)));
-//    commander.emplace("Route", std::unique_ptr<StringCommand>(new RouteStringCommand(*this)));
 }
 
 TrafficModel TrafficModelStringDirector::build()
@@ -281,31 +182,8 @@ void TrafficModelStringDirector::addNode(std::vector<std::string> &args) {
 
 void TrafficModelStringDirector::addBasicRoad(std::vector<std::string>& args)
 {
-    trafficModelBuilder.addBasicRoad(args[0], args[1], args[2], std::stof(args[3]), std::stoi(args[4]));
+    trafficModelBuilder.addBasicRoad(args[0], args[1], args[2], std::stof(args[3]), std::stof(args[4]), std::stoi(args[5]));
 }
-
-//void TrafficModelStringDirector::setWaitingTimesAlongRoute(std::vector<std::string>& args)
-//{
-//    for (std::string arg : args)
-//    {
-//        waitingTimesAlongRoute.push_back(std::stof(arg));
-//    }
-//}
-//
-//void TrafficModelStringDirector::setNodesAlongRoute(std::vector<std::string>& args)
-//{
-//    nodesAlongRoute = args;
-//}
-//
-//void TrafficModelStringDirector::setEdgesAlongRoute(std::vector<std::string>& args)
-//{
-//    edgesAlongRoute = args;
-//}
-
-//void TrafficModelStringDirector::addRoute()
-//{
-//    trafficModelBuilder.addRoute(nodesAlongRoute, edgesAlongRoute, waitingTimesAlongRoute);
-//}
 
 TrafficModelFileDirector::TrafficModelFileDirector(std::string fn)
     : fn(fn)

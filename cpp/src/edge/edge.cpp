@@ -1,10 +1,10 @@
 #include "edge/edge.h"
-#include "node.h"
+#include "node/node.h"
 
 #include <iostream>
 
-Edge::Edge(Node& inNode, Node& outNode, std::string label)
-    : inNode(inNode), outNode(outNode), label(label)
+Edge::Edge(Node& inNode, Node& outNode, std::string label, float length, float speedLimit)
+    : inNode(inNode), outNode(outNode), label(std::move(label)), length(length), speedLimit(speedLimit)
 {
     inNode.outEdges.emplace_back(*this);
     outNode.inEdges.emplace_back(*this);
@@ -45,3 +45,14 @@ void Edge::updateCars(float dt)
     }
 }
 
+std::vector<std::unique_ptr<Car>> Edge::getExitingCars() {
+    std::vector<std::unique_ptr<Car>> exiting_cars;
+    // Loop from back to front
+    for (auto car = cars.rbegin(); car != cars.rend(); ++car) {
+        if ((*car)->getX() > length) {
+            exiting_cars.push_back(std::move(*car));
+            cars.pop_back();
+        }
+    }
+    return exiting_cars;
+}

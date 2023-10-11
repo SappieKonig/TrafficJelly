@@ -1,6 +1,6 @@
 #include "route.h"
 #include "edge/edge.h"
-#include "node.h"
+#include "node/node.h"
 
 Checkpoint::Checkpoint(Node const& node, Edge& edgeToNode, float waitDurationBeforeEdge) // Part of the very sneaky workaround
     : node(node), edgeToNode(edgeToNode), waitDurationBeforeEdge(waitDurationBeforeEdge)

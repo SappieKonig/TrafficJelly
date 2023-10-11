@@ -25,8 +25,9 @@ class Car
 {
 private:
     float x = 0; // in m
+    float baseTarget = 0; // in m/s
     float v; // in m/s (starts at speed limit of current edge (or maybe not, idfk))
-    float offset; // in m/s (to be added to v, with respect to the speed limit)
+    float offset = 0; // in m/s (to be added to v, with respect to the speed limit)
     int lane; // in number of lanes (starts at 0) (lane 0 is the rightmost lane)
 
     std::unique_ptr<Action> action = nullptr;
@@ -38,6 +39,10 @@ private:
 public:
 //    Car(std::unique_ptr<RoutePlanner> routePlanner);
     Car();
+    void syncCarToEdge(float targetSpeed) {
+        baseTarget = targetSpeed;
+        x = 0;
+    }
     void updateAction(Observation const& observation);
     void step(float dt);
 
@@ -54,6 +59,8 @@ public:
     friend ToLeftLaneAction;
     friend ToRightLaneAction;
     friend CompositeAction;
+
+    float getTarget() const { return baseTarget + offset; }
 
     void accelerate(float dt);
     void softBrake(float dt);

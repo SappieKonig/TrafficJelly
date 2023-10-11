@@ -11,6 +11,7 @@
 #include "utils.h"
 //#include "observation.h"
 #include "visualizer.h"
+#include "car.h"
 
 /*
  * This is an edge for the internal graph of TrafficModel.
@@ -22,18 +23,20 @@ class Edge
 protected:
     // To keep track of every car in the driving order.
     std::list<std::unique_ptr<Car>> cars;
+    float const length; // In meters
+    float const speedLimit; // in m/s
 
     Node& inNode;
     Node& outNode;
     std::string const label;
 
 public:
-    Edge(Node& inNode, Node& outNode, std::string label);
+    Edge(Node& inNode, Node& outNode, std::string label, float length, float speedLimit);
     virtual ~Edge();
-    virtual void initialize() = 0;
     virtual void setActions() = 0;
     virtual std::string toString() const = 0;
     virtual void enterCar(std::unique_ptr<Car>&& car) = 0;
+    std::vector<std::unique_ptr<Car>> getExitingCars();
     void sortCars();
     void updateCars(float dt);
     void step(float dt) {
@@ -42,6 +45,7 @@ public:
         sortCars();
     }
     std::string getLabel() const;
+    int getNCars() const { return cars.size(); }
 };
 
 

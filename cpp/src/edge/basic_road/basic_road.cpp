@@ -3,25 +3,22 @@
 //
 
 #include "edge/basic_road/basic_road.h"
+
+#include <utility>
 #include "edge/basic_road/basic_road_observation.h"
 #include "car.h"
 #include "algorithm"
-#include "node.h"
+#include "node/node.h"
 
-BasicRoad::BasicRoad(Node& inNode, Node& outNode, std::string label, float length, int nLanes)
-        : Edge(inNode, outNode, label), length(length), nLanes(nLanes)
+BasicRoad::BasicRoad(Node& inNode, Node& outNode, std::string label, float length, float speedLimit, int nLanes)
+        : Edge(inNode, outNode, std::move(label), length, speedLimit),  nLanes(nLanes)
 {
 
-}
-
-void BasicRoad::initialize()
-{
-    // Maybe do some initial distribution
 }
 
 void BasicRoad::setActions()
 {
-    float margin = 200;  // update to be relative to speed
+    float margin = 200;  // update to be relative to speed (or don't)
     for (auto base_car = cars.begin(); base_car != cars.end(); ++base_car) {
         // Collect cars in front and in back
         std::vector<std::reference_wrapper<Car>> nearby_cars;
@@ -54,5 +51,6 @@ std::string BasicRoad::toString() const
 
 void BasicRoad::enterCar(std::unique_ptr<Car>&& car)
 {
+    car->syncCarToEdge(speedLimit);
     cars.push_front(std::move(car));
 }

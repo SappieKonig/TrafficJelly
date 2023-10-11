@@ -6,16 +6,13 @@
 #define CPP_SIMPLE_ROAD_H
 
 #include "edge/edge.h"
-#include "node.h"
+#include "node/node.h"
 
 
 class BasicRoad : public Edge
 {
-private:
-    float const length;
 public:
-    BasicRoad(Node& inNode, Node& outNode, std::string label, float length, int nLanes);
-    void initialize() override;
+    BasicRoad(Node& inNode, Node& outNode, std::string label, float length, float speedLimit, int nLanes);
     std::string toString() const override;
     void enterCar(std::unique_ptr<Car>&& car) override;
     void setActions() override;

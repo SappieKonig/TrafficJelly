@@ -1,6 +1,6 @@
 Node:A
 Node:B
 Node:C
-Node:D
-BasicRoad:AB,A,B,2100,2
-BasicRoad:BC,B,C,4300,2
+BasicRoad:AB,A,B,2100,25,2
+BasicRoad:BC,B,C,4300,25,2
+BasicRoad:CA,C,A,2100,25,2

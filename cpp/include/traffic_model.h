@@ -62,8 +62,7 @@ private:
     std::random_device device;
 
 public:
-//    void addBasicCity(std::string label); // Not safe, if existent label
-    void addNode(std::string label);
+    void addBasicCity(std::string label, int population);
     void addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float length, float speedLimit, int nLanes);
     TrafficModel getModel() { return trafficModel; }
 
@@ -105,10 +104,10 @@ public:
     void apply(std::vector<std::string>& args) const override;
 };
 
-class NodeStringCommand : public StringCommand
+class BasicCityStringCommand : public StringCommand
 {
 public:
-    NodeStringCommand(TrafficModelStringDirector& director);
+    BasicCityStringCommand(TrafficModelStringDirector& director);
     void apply(std::vector<std::string>& args) const override;
 };
 
@@ -128,14 +127,14 @@ private:
 public:
     TrafficModelStringDirector(std::string fn);
     TrafficModel build();
-    void addNode(std::vector<std::string>& args);
+    void addBasicCity(std::vector<std::string>& args);
 //    void addBasicCity(std::vector<std::string>& args); // Not safe, if existent label. Also, probably should add argument object for more clarity of the parameters in code. Is getting tedious though.
     void addBasicRoad(std::vector<std::string>& args);
 
     // Add string commands as friends, because I am too stupid to solve the encapsulation issues.
 //    friend BasicCityStringCommand;
     friend BasicRoadStringCommand;
-    friend NodeStringCommand;
+    friend BasicCityStringCommand;
 };
 
 /*

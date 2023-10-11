@@ -1,6 +1,6 @@
-Node:A
-Node:B
-Node:C
+BasicCity:A,1000
+BasicCity:B,2000
+BasicCity:C,3000
 BasicRoad:AB,A,B,2100,25,2
 BasicRoad:BC,B,C,4300,25,2
 BasicRoad:CA,C,A,2100,25,2

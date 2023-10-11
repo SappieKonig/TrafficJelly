@@ -21,19 +21,17 @@
  */
 
 class Node {
-private:
     std::string const label;
-    std::mt19937 rng;
 
 public:
     Node(std::string label);
+    std::string getLabel() { return label; }
     std::vector<std::reference_wrapper<Edge>> inEdges; // ref
     std::vector<std::reference_wrapper<Edge>> outEdges;
     std::vector<std::unique_ptr<Car>> storedCars;
-    void collectCars();
-    void distributeCars();
-    std::string getLabel() { return label; }
-    void step(float dt) {}
+    virtual void collectCars() = 0;
+    virtual void distributeCars() = 0;
+    virtual void step(float dt) = 0;
 };
 
 //class Node

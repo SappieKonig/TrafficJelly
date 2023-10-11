@@ -2,6 +2,7 @@
 //#include "visualizer.h"
 #include "car.h"
 #include "edge/basic_road/basic_road.h"
+#include "node/basic_city.h"
 
 #include <algorithm>
 #include <iostream>
@@ -48,8 +49,8 @@ void TrafficModel::display() const
     }
 }
 
-void TrafficModelBuilder::addNode(std::string label) {
-    std::shared_ptr<Node> node = std::make_shared<Node>(label);
+void TrafficModelBuilder::addBasicCity(std::string label, int population) {
+    std::shared_ptr<Node> node = std::make_shared<BasicCity>(label, population);
     trafficModel.nodes.emplace_back(node);
     trafficModel.labelToNode[label] = node;
 }
@@ -63,29 +64,22 @@ void TrafficModelBuilder::addBasicRoad(std::string label, std::string inNodeLabe
     trafficModel.labelToEdge[label] = edge;
 }
 
-//void TrafficModelBuilder::addBasicCity(std::string label)
-//{
-//    std::shared_ptr<Node> basicCity = std::make_shared<BasicCity>(label, trafficModel.routes, device);
-//    trafficModel.nodes.emplace_back(basicCity);
-//    trafficModel.labelToNode.emplace(label, basicCity);
-//}
-
 StringCommand::StringCommand(TrafficModelStringDirector& director)
     : director(director)
 {
 
 }
 
-//BasicCityStringCommand::BasicCityStringCommand(TrafficModelStringDirector& director)
-//    : StringCommand(director)
-//{
-//
-//}
-//
-//void BasicCityStringCommand::apply(std::vector<std::string>& args) const
-//{
-//    director.addBasicCity(args);
-//}
+BasicCityStringCommand::BasicCityStringCommand(TrafficModelStringDirector& director)
+    : StringCommand(director)
+{
+
+}
+
+void BasicCityStringCommand::apply(std::vector<std::string>& args) const
+{
+    director.addBasicCity(args);
+}
 
 BasicRoadStringCommand::BasicRoadStringCommand(TrafficModelStringDirector& director)
     : StringCommand(director)
@@ -98,23 +92,12 @@ void BasicRoadStringCommand::apply(std::vector<std::string>& args) const
     director.addBasicRoad(args);
 }
 
-NodeStringCommand::NodeStringCommand(TrafficModelStringDirector& director)
-    : StringCommand(director)
-{
-
-}
-
-void NodeStringCommand::apply(std::vector<std::string>& args) const
-{
-    director.addNode(args);
-}
-
 TrafficModelStringDirector::TrafficModelStringDirector(std::string str)
     : str(str)
 {
 //    commander.emplace("BasicCity", std::unique_ptr<StringCommand>(new BasicCityStringCommand(*this)));
     commander.emplace("BasicRoad", std::unique_ptr<StringCommand>(new BasicRoadStringCommand(*this)));
-    commander.emplace("Node", std::unique_ptr<StringCommand>(new NodeStringCommand(*this)));
+    commander.emplace("BasicCity", std::unique_ptr<StringCommand>(new BasicCityStringCommand(*this)));
 }
 
 TrafficModel TrafficModelStringDirector::build()
@@ -176,8 +159,8 @@ TrafficModel TrafficModelStringDirector::build()
 //    trafficModelBuilder.addBasicCity(args[0]);
 //}
 
-void TrafficModelStringDirector::addNode(std::vector<std::string> &args) {
-    trafficModelBuilder.addNode(args[0]);
+void TrafficModelStringDirector::addBasicCity(std::vector<std::string> &args) {
+    trafficModelBuilder.addBasicCity(args[0], std::stoi(args[1]));
 }
 
 void TrafficModelStringDirector::addBasicRoad(std::vector<std::string>& args)

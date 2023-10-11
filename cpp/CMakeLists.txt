@@ -11,6 +11,7 @@ set(SOURCES
         src/action.cpp
         src/action.cpp
         src/node/node.cpp
+        src/node/basic_city.cpp
         src/car.cpp
         src/traffic_model.cpp
         src/edge/edge.cpp

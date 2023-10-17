@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Optional
 
 import pygame
 
@@ -19,9 +20,15 @@ CAR_WIDTH = LANE_WIDTH  # m
 
 @dataclass(kw_only=True)
 class GameState:
-    time: float
+    """
+    Attributes
+    - `alpha` is the interpolation factor between simulation steps. It is equal to 0 when it is at the start of a step.
+      It is equal to 1 at the end of a step in the simulation. When alpha is greater than or equal to 1, the step
+      function of the simulation is called.
+    """
+    alpha: float
     delta_time: float
-    time_step: int
+    time_scale: float
     scale: float
     pan_offset_x: float
     pan_offset_y: float
@@ -34,6 +41,8 @@ class Game:
 
     def __init__(self, *, simulation: Simulation, camera: Camera):
         pygame.init()
+        self.font = pygame.font.Font(None, 36)
+
         self.screen = pygame.display.set_mode((1280, 720))
         self.clock = pygame.time.Clock()
         self.display = pygame.display
@@ -44,6 +53,7 @@ class Game:
         self.lanes = simulation.get_lane_count()
 
         self.marginal_buffer = 100  # m
+        self.time_scale_rate = 2
         self.scale_rate_base = 2  # multiplier per second
         self.scale_rate_multiplier_base = 2
         self.pan_rate_base = 100  # pixels
@@ -56,9 +66,9 @@ class Game:
         self.pan_rate_y = 0
         self.pan_rate_multiplier = 1
         self.state = GameState(
-            time=0,
+            alpha=1,
             delta_time=simulation.get_delta_time(),
-            time_step=-1,
+            time_scale=1.0,
             scale=1,
             pan_offset_x=0,
             pan_offset_y=0,
@@ -83,7 +93,7 @@ class Game:
             self.step()
             self.display.flip()
             self.dt = self.clock.tick(self.FPS) / 1000
-            self.state.time += self.dt
+            self.state.alpha += self.dt * self.state.time_scale / self.state.delta_time
 
     def on_event(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:
@@ -113,6 +123,10 @@ class Game:
                 self.pan_rate_x = 0
             if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                 self.pan_rate_y = 0
+            if event.key == pygame.K_PERIOD:
+                self.state.time_scale *= self.time_scale_rate
+            if event.key == pygame.K_COMMA:
+                self.state.time_scale /= self.time_scale_rate
 
     def step(self):
         self.update_viewport()
@@ -121,6 +135,7 @@ class Game:
         self.screen.fill('darkgreen')
         self.draw_road()
         self.draw_cars()
+        self.draw_info()
 
     def update_viewport(self):
         if self.dt != 0:
@@ -133,15 +148,14 @@ class Game:
         self.state.pan_offset_y += self.dt * self.pan_rate_y * self.pan_rate_multiplier / self.state.scale
 
     def update_state(self):
-        current_time_step = self.state.time // self.state.delta_time
-        while current_time_step - 1 > self.state.time_step:
+        while self.state.alpha >= 2:
             self.simulation.step_forward()
-            self.state.time_step += 1
-        if current_time_step > self.state.time_step:
+            self.state.alpha -= 1
+        if self.state.alpha >= 1:
             interval = self.get_displayed_cars_interval()
             self.state.prev_cars = self.get_graphics_cars(interval)
             self.simulation.step_forward()
-            self.state.time_step += 1
+            self.state.alpha -= 1
             self.state.next_cars = self.get_graphics_cars(interval)
 
     def draw_road(self):
@@ -157,13 +171,12 @@ class Game:
         pygame.draw.rect(self.screen, 'black', road_rect)
 
     def draw_cars(self):
-        dt = self.state.delta_time
         offset = self.get_scaled_offset()
 
         scale = self.state.scale
         # alpha = 0 -> interpolation is in next_cars
         # alpha = 1 -> interpolation is in prev_cars
-        alpha = self.state.time % dt / dt
+        alpha = self.state.alpha
         beta = 1 - alpha
 
         cars = self.state.next_cars
@@ -191,6 +204,14 @@ class Game:
 
             pygame.draw.rect(self.screen, self.color_mapping[car_id], car_rect)
 
+    def draw_info(self):
+        text_surface = self.font.render(f'Time scale: {self.state.time_scale}', True, (255, 255, 255))
+        text_surface.set_alpha(128)
+        text_rect = text_surface.get_rect()
+        text_rect.bottomleft = self.screen.get_rect().bottomleft
+        text_rect.move_ip(10, -10)
+        self.screen.blit(text_surface, text_rect)
+
     def get_graphics_cars(self, interval: tuple[float, float]):
         return self.simulation.get_graphics_cars_in_interval(interval)
 
@@ -209,4 +230,3 @@ class Game:
             self.state.pan_offset_x - self.camera.get_x_center(self.state),
             self.state.pan_offset_y,
         )
-

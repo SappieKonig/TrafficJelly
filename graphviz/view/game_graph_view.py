@@ -142,7 +142,8 @@ class GameGraphView(GameView):
         density_interval_dist_padding = self.density_interval_pixel_padding * meter_per_pixel
         for i, count in enumerate(hist):
             if count == 0:
-                color = 'white'
+                continue
+                # color = 'white'
             elif count == 1:
                 color = 'green'
             else:

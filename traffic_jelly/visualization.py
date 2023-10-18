@@ -1,13 +1,12 @@
+from abc import ABCMeta, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
 
 import pygame
 
+from traffic_jelly.camera import Camera
 from traffic_jelly.data_types import GraphicsCar
 from traffic_jelly.simulation import Simulation
 from traffic_jelly.util import get_random_color
-from traffic_jelly.camera import Camera
-
 
 MAX_SPEED = 300  # m/s
 
@@ -26,9 +25,14 @@ class GameState:
       It is equal to 1 at the end of a step in the simulation. When alpha is greater than or equal to 1, the step
       function of the simulation is called.
     """
+    # Simulation state
     alpha: float
     delta_time: float
     time_scale: float
+
+
+@dataclass(kw_only=True)
+class GameRoadState:
     scale: float
     pan_offset_x: float
     pan_offset_y: float
@@ -36,14 +40,25 @@ class GameState:
     next_cars: dict[int, GraphicsCar]
 
 
-class Game:
-    FPS = 60
+class GameView(metaclass=ABCMeta):
+    @abstractmethod
+    def on_event(self, event: pygame.event.Event): pass
 
-    def __init__(self, *, simulation: Simulation, camera: Camera):
-        pygame.init()
-        self.font = pygame.font.Font(None, 36)
+    @abstractmethod
+    def update_viewport(self): pass
 
-        self.screen = pygame.display.set_mode((1280, 720))
+    @abstractmethod
+    def update_state(self): pass
+
+    @abstractmethod
+    def render(self): pass
+
+
+class GameRoadView(GameView):
+    def __init__(self, *, game: 'Game', simulation: Simulation, camera: Camera):
+        self.game = game
+        self.screen = game.screen
+
         self.clock = pygame.time.Clock()
         self.display = pygame.display
         self.simulation = simulation
@@ -53,47 +68,24 @@ class Game:
         self.lanes = simulation.get_lane_count()
 
         self.marginal_buffer = 100  # m
-        self.time_scale_rate = 2
         self.scale_rate_base = 2  # multiplier per second
         self.scale_rate_multiplier_base = 2
         self.pan_rate_base = 100  # pixels
         self.pan_rate_multiplier_base = 4
 
-        self.dt = 0
         self.scale_rate = 1
         self.scale_rate_multiplier = 1
         self.pan_rate_x = 0
         self.pan_rate_y = 0
         self.pan_rate_multiplier = 1
-        self.state = GameState(
-            alpha=1,
-            delta_time=simulation.get_delta_time(),
-            time_scale=1.0,
+
+        self.state = GameRoadState(
             scale=1,
             pan_offset_x=0,
             pan_offset_y=0,
             prev_cars={},
             next_cars={},
         )
-
-    def get_screen_center(self) -> pygame.Vector2:
-        return pygame.Vector2(self.screen.get_rect().center)
-
-    def main(self):
-        self.loop()
-        pygame.quit()
-
-    def loop(self):
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                self.on_event(event)
-            self.step()
-            self.display.flip()
-            self.dt = self.clock.tick(self.FPS) / 1000
-            self.state.alpha += self.dt * self.state.time_scale / self.state.delta_time
 
     def on_event(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:
@@ -123,40 +115,31 @@ class Game:
                 self.pan_rate_x = 0
             if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                 self.pan_rate_y = 0
-            if event.key == pygame.K_PERIOD:
-                self.state.time_scale *= self.time_scale_rate
-            if event.key == pygame.K_COMMA:
-                self.state.time_scale /= self.time_scale_rate
 
-    def step(self):
-        self.update_viewport()
-        self.update_state()
+    def update_viewport(self):
+        dt = self.game.dt
+        if dt != 0:
+            screen_center = self.get_screen_center()
+            scale_factor = self.scale_rate ** (dt * self.scale_rate_multiplier)
+            self.state.scale *= scale_factor
+            self.state.pan_offset_x -= (scale_factor - 1) * screen_center.x / self.state.scale
+            self.state.pan_offset_y -= (scale_factor - 1) * screen_center.y / self.state.scale
+        self.state.pan_offset_x += dt * self.pan_rate_x * self.pan_rate_multiplier / self.state.scale
+        self.state.pan_offset_y += dt * self.pan_rate_y * self.pan_rate_multiplier / self.state.scale
 
+    def update_state(self):
+        if self.game.state.alpha >= 1:
+            interval = self.get_displayed_cars_interval()
+            self.state.prev_cars = self.get_graphics_cars(interval)
+            self.simulation.step_forward()
+            self.game.state.alpha -= 1
+            self.state.next_cars = self.get_graphics_cars(interval)
+
+    def render(self):
         self.screen.fill('darkgreen')
         self.draw_road()
         self.draw_cars()
         self.draw_info()
-
-    def update_viewport(self):
-        if self.dt != 0:
-            screen_center = self.get_screen_center()
-            scale_factor = self.scale_rate ** (self.dt * self.scale_rate_multiplier)
-            self.state.scale *= scale_factor
-            self.state.pan_offset_x -= (scale_factor - 1) * screen_center.x / self.state.scale
-            self.state.pan_offset_y -= (scale_factor - 1) * screen_center.y / self.state.scale
-        self.state.pan_offset_x += self.dt * self.pan_rate_x * self.pan_rate_multiplier / self.state.scale
-        self.state.pan_offset_y += self.dt * self.pan_rate_y * self.pan_rate_multiplier / self.state.scale
-
-    def update_state(self):
-        while self.state.alpha >= 2:
-            self.simulation.step_forward()
-            self.state.alpha -= 1
-        if self.state.alpha >= 1:
-            interval = self.get_displayed_cars_interval()
-            self.state.prev_cars = self.get_graphics_cars(interval)
-            self.simulation.step_forward()
-            self.state.alpha -= 1
-            self.state.next_cars = self.get_graphics_cars(interval)
 
     def draw_road(self):
         offset = self.get_scaled_offset()
@@ -176,7 +159,7 @@ class Game:
         scale = self.state.scale
         # alpha = 0 -> interpolation is in next_cars
         # alpha = 1 -> interpolation is in prev_cars
-        alpha = self.state.alpha
+        alpha = self.game.state.alpha
         beta = 1 - alpha
 
         cars = self.state.next_cars
@@ -205,7 +188,7 @@ class Game:
             pygame.draw.rect(self.screen, self.color_mapping[car_id], car_rect)
 
     def draw_info(self):
-        text_surface = self.font.render(f'Time scale: {self.state.time_scale}', True, (255, 255, 255))
+        text_surface = self.game.font.render(f'Time scale: {self.game.state.time_scale}', True, (255, 255, 255))
         text_surface.set_alpha(128)
         text_rect = text_surface.get_rect()
         text_rect.bottomleft = self.screen.get_rect().bottomleft
@@ -217,7 +200,7 @@ class Game:
 
     def get_displayed_cars_interval(self):
         screen_rect = self.screen.get_rect()
-        max_speed_buffer = self.dt * MAX_SPEED
+        max_speed_buffer = self.game.dt * MAX_SPEED
         center = -self.get_offset().x + self.get_screen_center().x / self.state.scale
         radius = (screen_rect.width * 0.5 + max_speed_buffer) / self.state.scale + self.marginal_buffer
         return center - radius, center + radius
@@ -227,6 +210,79 @@ class Game:
 
     def get_offset(self):
         return self.get_screen_center() + pygame.Vector2(
-            self.state.pan_offset_x - self.camera.get_x_center(self.state),
+            self.state.pan_offset_x - self.camera.get_x_center(self.game.state, self.state),
             self.state.pan_offset_y,
         )
+
+    def get_screen_center(self) -> pygame.Vector2:
+        return pygame.Vector2(self.screen.get_rect().center)
+
+
+class Game:
+    FPS = 60
+
+    state: GameState
+
+    def __init__(self, *, simulation: Simulation, camera: Camera):
+        pygame.init()
+
+        self.font = pygame.font.Font(None, 36)
+
+        self.screen = pygame.display.set_mode((1280, 720))
+        self.clock = pygame.time.Clock()
+        self.display = pygame.display
+        self.simulation = simulation
+        self.camera = camera
+        self.views = [GameRoadView(game=self, simulation=simulation, camera=camera)]
+
+        self.time_scale_rate = 2
+
+        self.dt = 0
+        self.state = GameState(
+            alpha=1,
+            delta_time=simulation.get_delta_time(),
+            time_scale=1.0,
+        )
+
+    def main(self):
+        self.loop()
+        pygame.quit()
+
+    def loop(self):
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                self.on_event(event)
+            self.update_viewport()
+            self.update_state()
+            self.render()
+
+            self.display.flip()
+            self.dt = self.clock.tick(self.FPS) / 1000
+            self.state.alpha += self.dt * self.state.time_scale / self.state.delta_time
+
+    def on_event(self, event: pygame.event.Event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_PERIOD:
+                self.state.time_scale *= self.time_scale_rate
+            if event.key == pygame.K_COMMA:
+                self.state.time_scale /= self.time_scale_rate
+        self.view.on_event(event)
+
+    def update_viewport(self):
+        self.view.update_viewport()
+
+    def update_state(self):
+        while self.state.alpha >= 2:
+            self.simulation.step_forward()
+            self.state.alpha -= 1
+        self.view.update_state()
+
+    def render(self):
+        self.view.render()
+
+    @property
+    def view(self) -> GameView:
+        return self.views[-1]

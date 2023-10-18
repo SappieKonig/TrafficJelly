@@ -1,71 +1,36 @@
-from abc import ABCMeta, abstractmethod
-from dataclasses import dataclass
+import math
+from typing import TYPE_CHECKING
 
 import pygame
 
-from traffic_jelly.camera import Camera
-from traffic_jelly.data_types import GraphicsCar
-from traffic_jelly.simulation import Simulation
-from traffic_jelly.util import get_random_color
+from graphviz.simulation import Simulation
+from graphviz.state.game_road_state import GameRoadState, GraphicsCar
+from graphviz.util.color import get_random_color
+from graphviz.view.game_view import GameView
 
-MAX_SPEED = 300  # m/s
-
-LANE_WIDTH = 3.5
-
-CAR_LENGTH = 4.5  # m
-# CAR_WIDTH = 2  # m
-CAR_WIDTH = LANE_WIDTH  # m
-
-
-@dataclass(kw_only=True)
-class GameState:
-    """
-    Attributes
-    - `alpha` is the interpolation factor between simulation steps. It is equal to 0 when it is at the start of a step.
-      It is equal to 1 at the end of a step in the simulation. When alpha is greater than or equal to 1, the step
-      function of the simulation is called.
-    """
-    # Simulation state
-    alpha: float
-    delta_time: float
-    time_scale: float
-
-
-@dataclass(kw_only=True)
-class GameRoadState:
-    scale: float
-    pan_offset_x: float
-    pan_offset_y: float
-    prev_cars: dict[int, GraphicsCar]
-    next_cars: dict[int, GraphicsCar]
-
-
-class GameView(metaclass=ABCMeta):
-    @abstractmethod
-    def on_event(self, event: pygame.event.Event): pass
-
-    @abstractmethod
-    def update_viewport(self): pass
-
-    @abstractmethod
-    def update_state(self): pass
-
-    @abstractmethod
-    def render(self): pass
+if TYPE_CHECKING:
+    from graphviz.game import Game
 
 
 class GameRoadView(GameView):
-    def __init__(self, *, game: 'Game', simulation: Simulation, camera: Camera):
+    def __init__(self, *, game: 'Game', edge_id: int):
         self.game = game
+        self.edge_id = edge_id
         self.screen = game.screen
+        self.simulation = game.simulation
 
         self.clock = pygame.time.Clock()
         self.display = pygame.display
-        self.simulation = simulation
-        self.camera = camera
         self.color_mapping = dict()
 
-        self.lanes = simulation.get_lane_count()
+        self.max_speed = 300
+        self.lane_width = 3.5
+        self.car_length = 4.5
+        self.car_width = self.lane_width
+        # self.car_width = 2  # True car width
+
+        self.lane_count = simulation.get_edge_lane_count(edge_id)
+        self.road_length = simulation.get_edge_road_length(edge_id)
 
         self.marginal_buffer = 100  # m
         self.scale_rate_base = 2  # multiplier per second
@@ -128,6 +93,9 @@ class GameRoadView(GameView):
         self.state.pan_offset_y += dt * self.pan_rate_y * self.pan_rate_multiplier / self.state.scale
 
     def update_state(self):
+        while self.game.state.alpha >= 2:
+            self.simulation.step_forward()
+            self.game.state.alpha -= 1
         if self.game.state.alpha >= 1:
             interval = self.get_displayed_cars_interval()
             self.state.prev_cars = self.get_graphics_cars(interval)
@@ -145,8 +113,8 @@ class GameRoadView(GameView):
         offset = self.get_scaled_offset()
         road_rect = pygame.rect.Rect((
             0, 0,
-            self.simulation.get_road_length() * self.state.scale,
-            self.simulation.get_lane_count() * LANE_WIDTH * self.state.scale,
+            self.road_length * self.state.scale,
+            max((1, self.lane_count * self.lane_width * self.state.scale)),
         ))
         road_rect.move_ip(offset)
 
@@ -178,10 +146,10 @@ class GameRoadView(GameView):
             y = alpha * next_y + beta * prev_y
 
             car_rect = pygame.rect.Rect(
-                (x - CAR_WIDTH * 0.5) * scale,
-                (LANE_WIDTH * (self.lanes - y - 0.5) - CAR_WIDTH * 0.5) * scale,
-                CAR_LENGTH * scale,
-                CAR_WIDTH * scale
+                (x - self.car_width * 0.5) * scale,
+                (self.lane_width * (self.lane_count - y - 0.5) - self.car_width * 0.5) * scale,
+                self.car_length * scale,
+                self.car_width * scale
             )
             car_rect.move_ip(offset)
 
@@ -189,18 +157,24 @@ class GameRoadView(GameView):
 
     def draw_info(self):
         text_surface = self.game.font.render(f'Time scale: {self.game.state.time_scale}', True, (255, 255, 255))
-        text_surface.set_alpha(128)
+        text_surface.set_alpha(192)
         text_rect = text_surface.get_rect()
         text_rect.bottomleft = self.screen.get_rect().bottomleft
         text_rect.move_ip(10, -10)
         self.screen.blit(text_surface, text_rect)
 
-    def get_graphics_cars(self, interval: tuple[float, float]):
-        return self.simulation.get_graphics_cars_in_interval(interval)
+    def get_graphics_cars(self, interval: tuple[float, float]) -> dict[int, GraphicsCar]:
+        cars = dict()
+        for car_id in self.simulation.get_car_ids_in_edge_on_interval(self.edge_id, interval):
+            cars[car_id] = self.get_graphics_car_from_id(car_id)
+        return cars
+
+    def get_graphics_car_from_id(self, car_id: int):
+        return GraphicsCar(id=car_id, x=self.simulation.get_car_x(car_id), y=self.simulation.get_car_lane(car_id))
 
     def get_displayed_cars_interval(self):
         screen_rect = self.screen.get_rect()
-        max_speed_buffer = self.game.dt * MAX_SPEED
+        max_speed_buffer = self.game.dt * self.max_speed
         center = -self.get_offset().x + self.get_screen_center().x / self.state.scale
         radius = (screen_rect.width * 0.5 + max_speed_buffer) / self.state.scale + self.marginal_buffer
         return center - radius, center + radius
@@ -210,79 +184,9 @@ class GameRoadView(GameView):
 
     def get_offset(self):
         return self.get_screen_center() + pygame.Vector2(
-            self.state.pan_offset_x - self.camera.get_x_center(self.game.state, self.state),
+            self.state.pan_offset_x,
             self.state.pan_offset_y,
         )
 
     def get_screen_center(self) -> pygame.Vector2:
         return pygame.Vector2(self.screen.get_rect().center)
-
-
-class Game:
-    FPS = 60
-
-    state: GameState
-
-    def __init__(self, *, simulation: Simulation, camera: Camera):
-        pygame.init()
-
-        self.font = pygame.font.Font(None, 36)
-
-        self.screen = pygame.display.set_mode((1280, 720))
-        self.clock = pygame.time.Clock()
-        self.display = pygame.display
-        self.simulation = simulation
-        self.camera = camera
-        self.views = [GameRoadView(game=self, simulation=simulation, camera=camera)]
-
-        self.time_scale_rate = 2
-
-        self.dt = 0
-        self.state = GameState(
-            alpha=1,
-            delta_time=simulation.get_delta_time(),
-            time_scale=1.0,
-        )
-
-    def main(self):
-        self.loop()
-        pygame.quit()
-
-    def loop(self):
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                self.on_event(event)
-            self.update_viewport()
-            self.update_state()
-            self.render()
-
-            self.display.flip()
-            self.dt = self.clock.tick(self.FPS) / 1000
-            self.state.alpha += self.dt * self.state.time_scale / self.state.delta_time
-
-    def on_event(self, event: pygame.event.Event):
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_PERIOD:
-                self.state.time_scale *= self.time_scale_rate
-            if event.key == pygame.K_COMMA:
-                self.state.time_scale /= self.time_scale_rate
-        self.view.on_event(event)
-
-    def update_viewport(self):
-        self.view.update_viewport()
-
-    def update_state(self):
-        while self.state.alpha >= 2:
-            self.simulation.step_forward()
-            self.state.alpha -= 1
-        self.view.update_state()
-
-    def render(self):
-        self.view.render()
-
-    @property
-    def view(self) -> GameView:
-        return self.views[-1]

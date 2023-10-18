@@ -1,26 +1,29 @@
-from traffic_jelly.simulation import BasicSimulation, ComplexSimulation
-from traffic_jelly.camera import StationaryCamera
-from traffic_jelly.visualization import Game
+from __future__ import annotations
 
-import time
+from graphviz.game import Game
+from graphviz.simulation import Simulation
+# noinspection PyUnresolvedReferences
+from graphviz.view.game_graph_view import GameGraphView
+# noinspection PyUnresolvedReferences
+from graphviz.view.game_road_view import GameRoadView
 
 
 def main():
-    simulation = ComplexSimulation(length=5000, spawn_prob_per_sec=.6)
-    car_updates = 0
-    start = time.time()
-    for _ in range(int(1e3 / simulation.get_delta_time())):
-        car_updates += len(simulation.vehicles)
-        simulation.step_forward()
-    end = time.time()
-    print(f'Average car updates per second: {car_updates / (end - start):.2f}')
-    simulation.cause_breakdown(1000)
-    camera = StationaryCamera(500)
-    Game(
-        simulation=simulation,
-        camera=camera
-    ).main()
+    simulation = create_simulation()
+    game = Game(simulation=simulation)
+    game.push_view(GameGraphView(game=game))
+    game.main()
+
+
+def create_simulation():
+    simulation = Simulation()
+    edge_ids = simulation.get_edge_ids()
+    assert edge_ids
+    # noinspection PyProtectedMember
+    simulation._add_cars_to_edge(edge_ids[0], 50)
+    return simulation
 
 
 if __name__ == '__main__':
     main()
+

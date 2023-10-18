@@ -54,7 +54,7 @@ class GameGraphView(GameView):
 
         self.dt = 0
 
-        self.scale = .1
+        self.scale = .05
 
     def insert_viz_graph(self):
         sim = self.simulation

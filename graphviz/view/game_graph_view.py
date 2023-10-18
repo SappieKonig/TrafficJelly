@@ -143,7 +143,6 @@ class GameGraphView(GameView):
         for i, count in enumerate(hist):
             if count == 0:
                 continue
-                # color = 'white'
             elif count == 1:
                 color = 'green'
             else:

@@ -1,4 +1,5 @@
 #include "traffic_model.h"
+#include <pybind11/pybind11.h>
 //#include "visualizer.h"
 #include "car.h"
 #include "edge/basic_road/basic_road.h"
@@ -168,16 +169,18 @@ void TrafficModelStringDirector::addBasicRoad(std::vector<std::string>& args)
     trafficModelBuilder.addBasicRoad(args[0], args[1], args[2], std::stof(args[3]), std::stof(args[4]), std::stoi(args[5]));
 }
 
-TrafficModelFileDirector::TrafficModelFileDirector(std::string fn)
-    : fn(fn)
-{
 
-}
-
-TrafficModel TrafficModelFileDirector::build()
-{
+TrafficModel TrafficModel::from_file(std::string fn) {
     std::ifstream file(fn);
     std::string str(std::istreambuf_iterator<char>{file}, {});
     return TrafficModelStringDirector(str).build();
+}
+
+
+PYBIND11_MODULE(traffic_model, m) {
+    pybind11::class_<TrafficModel>(m, "TrafficModel")
+        .def("step", &TrafficModel::step)
+        .def("display", &TrafficModel::display)
+        .def_static("from_file", &TrafficModel::from_file);
 }
 

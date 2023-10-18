@@ -48,6 +48,7 @@ public:
         return *edges[idx];
     }
     friend TrafficModelBuilder;
+    static TrafficModel from_file(std::string fn);
 };
 
 /*
@@ -135,19 +136,6 @@ public:
 //    friend BasicCityStringCommand;
     friend BasicRoadStringCommand;
     friend BasicCityStringCommand;
-};
-
-/*
- * This traffic model file director allows for the traffic model to be constructed from a text file.
- */
-class TrafficModelFileDirector
-{
-private:
-    std::string fn;
-
-public:
-    TrafficModelFileDirector(std::string fn);
-    TrafficModel build();
 };
 
 #endif

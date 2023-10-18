@@ -13,3 +13,4 @@ class GameState:
     alpha: float
     delta_time: float
     time_scale: float
+    time_factor_pause: float

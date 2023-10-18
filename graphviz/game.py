@@ -29,6 +29,7 @@ class Game:
             alpha=1,
             delta_time=simulation.get_delta_time(),
             time_scale=1.0,
+            time_factor_pause=1.0,
         )
 
     def push_view(self, view: GameView):
@@ -50,7 +51,7 @@ class Game:
             self.render()
 
             self.display.flip()
-            self.dt = self.clock.tick(self.FPS) / 1000
+            self.dt = self.clock.tick(self.FPS) / 1000 * self.state.time_factor_pause
             self.state.alpha += self.dt * self.state.time_scale / self.state.delta_time
 
     def on_event(self, event: pygame.event.Event):
@@ -59,6 +60,8 @@ class Game:
                 self.state.time_scale *= self.time_scale_rate
             if event.key == pygame.K_COMMA:
                 self.state.time_scale /= self.time_scale_rate
+            if event.key == pygame.K_SPACE:
+                self.toggle_pause()
         self.view.on_event(event)
 
     def update_viewport(self):
@@ -73,3 +76,9 @@ class Game:
     @property
     def view(self) -> GameView:
         return self.views[-1]
+
+    def toggle_pause(self):
+        if self.state.time_factor_pause == 0:
+            self.state.time_factor_pause = 1
+        else:
+            self.state.time_factor_pause = 0

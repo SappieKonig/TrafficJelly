@@ -147,11 +147,15 @@ class GameGraphView(GameView):
                 color = 'green'
             else:
                 color = 'orange'
+
             dist_start = edges[i]
             dist_end = edges[i+1]
             if count != 0:
                 dist_start -= density_interval_dist_padding
                 dist_end += density_interval_dist_padding
+            dist_start = max(0, dist_start)
+            dist_end = min(dist_end, dist_in_meters)
+
             pos_start = edge.pos0 + (dist_start / dist_in_meters) * (edge.pos1 - edge.pos0)
             pos_end = edge.pos0 + (dist_end / dist_in_meters) * (edge.pos1 - edge.pos0)
             pygame.draw.line(self.screen, color,

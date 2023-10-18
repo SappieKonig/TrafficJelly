@@ -166,12 +166,20 @@ class GameGraphView(GameView):
     def draw_node(self, node: VizNode):
         offset = self.get_offset()
         radius = self.node_radius_base + self.node_radius_inc * node.size
-        pygame.draw.circle(self.screen, 'white',
-                           offset + self.scale_and_round(node.pos),
-                           radius)
-        pygame.draw.circle(self.screen, 'black',
-                           offset + self.scale_and_round(node.pos),
-                           radius, 2)
+        center = offset + self.scale_and_round(node.pos)
+
+        car_count = self.simulation.get_car_count_in_node(node.id)
+        if car_count == 0:  # Will probably be done using HSL later, when the model has been integrated.
+            color = 'white'
+        elif car_count <= 20:
+            color = 'green'
+        elif car_count <= 40:
+            color = 'orange'
+        else:
+            color = 'red'
+
+        pygame.draw.circle(self.screen, color, center, radius)
+        pygame.draw.circle(self.screen, 'black', center, radius, 2)
 
     def draw_info(self):
         text_surface = self.game.font.render(f'Time scale: {self.game.state.time_scale}', True, (0, 0, 0))

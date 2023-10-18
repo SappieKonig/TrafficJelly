@@ -148,6 +148,12 @@ class Simulation:
         # hist[i] contains the count of distances between (edges[i] and edges[i+1])
         # edges should be about equal to bins
         return hist, edges
+    
+    def get_car_count_in_node(self, node_id: int) -> int:
+        pass  # may be useful for visualisation, so please implement it
+
+    def get_car_capacity_of_node(self, node_id: int) -> int:
+        pass  # may be useful for visualisation, so please implement it
 
     def get_node_pos(self, node_id: int) -> tuple[float, float]:
         node = self.__nodes[node_id]

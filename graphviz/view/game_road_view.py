@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 import pygame
 
 from graphviz.simulation import Simulation
-from graphviz.state.game_road_state import GameRoadState, GraphicsCar
+from graphviz.state.game_road_state import GameRoadState, VizCar
 from graphviz.util.color import get_random_color
 from graphviz.view.game_view import GameView
 
@@ -163,14 +163,14 @@ class GameRoadView(GameView):
         text_rect.move_ip(10, -10)
         self.screen.blit(text_surface, text_rect)
 
-    def get_graphics_cars(self, interval: tuple[float, float]) -> dict[int, GraphicsCar]:
+    def get_graphics_cars(self, interval: tuple[float, float]) -> dict[int, VizCar]:
         cars = dict()
         for car_id in self.simulation.get_car_ids_in_edge_on_interval(self.edge_id, interval):
             cars[car_id] = self.get_graphics_car_from_id(car_id)
         return cars
 
     def get_graphics_car_from_id(self, car_id: int):
-        return GraphicsCar(id=car_id, x=self.simulation.get_car_x(car_id), y=self.simulation.get_car_lane(car_id))
+        return VizCar(id=car_id, x=self.simulation.get_car_x(car_id), y=self.simulation.get_car_lane(car_id))
 
     def get_displayed_cars_interval(self):
         screen_rect = self.screen.get_rect()

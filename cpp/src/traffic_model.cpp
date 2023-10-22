@@ -8,11 +8,15 @@
 #include <algorithm>
 #include <iostream>
 #include <memory>
+#include <utility>
 #include <vector>
 
-TrafficModel::TrafficModel()
+TrafficModel::TrafficModel(std::string fn)
 {
-
+    std::ifstream file(fn);
+    std::string str(std::istreambuf_iterator<char>{file}, {});
+    auto builder = TrafficModelBuilder(*this);
+    builder.build(str);
 }
 
 void TrafficModel::step(float dt)
@@ -65,48 +69,40 @@ void TrafficModelBuilder::addBasicRoad(std::string label, std::string inNodeLabe
     trafficModel.labelToEdge[label] = edge;
 }
 
-StringCommand::StringCommand(TrafficModelStringDirector& director)
-    : director(director)
-{
+StringCommand::StringCommand(TrafficModelBuilder& trafficModelBuilder)
+    : trafficModelBuilder(trafficModelBuilder) {}
 
-}
 
-BasicCityStringCommand::BasicCityStringCommand(TrafficModelStringDirector& director)
-    : StringCommand(director)
-{
+BasicCityStringCommand::BasicCityStringCommand(TrafficModelBuilder& trafficModelBuilder)
+    : StringCommand(trafficModelBuilder) {}
 
-}
 
 void BasicCityStringCommand::apply(std::vector<std::string>& args) const
 {
-    director.addBasicCity(args);
+    trafficModelBuilder.addBasicCity(args[0], std::stoi(args[1]));
 }
 
-BasicRoadStringCommand::BasicRoadStringCommand(TrafficModelStringDirector& director)
-    : StringCommand(director)
-{
-
-}
+BasicRoadStringCommand::BasicRoadStringCommand(TrafficModelBuilder& trafficModelBuilder)
+    : StringCommand(trafficModelBuilder) {}
 
 void BasicRoadStringCommand::apply(std::vector<std::string>& args) const
 {
-    director.addBasicRoad(args);
+    trafficModelBuilder.addBasicRoad(args[0], args[1], args[2], std::stof(args[3]), std::stof(args[4]), std::stoi(args[5]));
 }
 
-TrafficModelStringDirector::TrafficModelStringDirector(std::string str)
-    : str(str)
+TrafficModelBuilder::TrafficModelBuilder(TrafficModel& trafficModel)
+    : trafficModel(trafficModel)
 {
-//    commander.emplace("BasicCity", std::unique_ptr<StringCommand>(new BasicCityStringCommand(*this)));
     commander.emplace("BasicRoad", std::unique_ptr<StringCommand>(new BasicRoadStringCommand(*this)));
     commander.emplace("BasicCity", std::unique_ptr<StringCommand>(new BasicCityStringCommand(*this)));
 }
 
-TrafficModel TrafficModelStringDirector::build()
+void TrafficModelBuilder::build(std::string file_content)
 {
     std::string buffer;
     std::string commandBuffer;
     std::vector<std::string> argumentBuffer;
-    for (char ch : str)
+    for (char ch : file_content)
     {
         switch (ch)
         {
@@ -132,55 +128,13 @@ TrafficModel TrafficModelStringDirector::build()
                 break;
         }
     }
-
-    return trafficModelBuilder.getModel();
-}
-
-//void TrafficModelBuilder::save(std::string fn) const
-//{
-//    std::string str = "";
-//    for (auto const& node : trafficModel.nodes)
-//    {
-//        str += node->toString() + "\n";
-//    }
-//    for (auto const& edge : trafficModel.edges)
-//    {
-//        str += edge->toString() + "\n";
-//    }
-//    for (auto const& route : trafficModel.routes)
-//    {
-//        str += route.toString() + "\n";
-//    }
-//    std::ofstream file(fn);
-//    file << str;
-//}
-
-//void TrafficModelStringDirector::addBasicCity(std::vector<std::string>& args)
-//{
-//    trafficModelBuilder.addBasicCity(args[0]);
-//}
-
-void TrafficModelStringDirector::addBasicCity(std::vector<std::string> &args) {
-    trafficModelBuilder.addBasicCity(args[0], std::stoi(args[1]));
-}
-
-void TrafficModelStringDirector::addBasicRoad(std::vector<std::string>& args)
-{
-    trafficModelBuilder.addBasicRoad(args[0], args[1], args[2], std::stof(args[3]), std::stof(args[4]), std::stoi(args[5]));
-}
-
-
-TrafficModel TrafficModel::from_file(std::string fn) {
-    std::ifstream file(fn);
-    std::string str(std::istreambuf_iterator<char>{file}, {});
-    return TrafficModelStringDirector(str).build();
 }
 
 
 PYBIND11_MODULE(traffic_model, m) {
     pybind11::class_<TrafficModel>(m, "TrafficModel")
+        .def(pybind11::init<const std::string &>())
         .def("step", &TrafficModel::step)
-        .def("display", &TrafficModel::display)
-        .def_static("from_file", &TrafficModel::from_file);
+        .def("display", &TrafficModel::display);
 }
 

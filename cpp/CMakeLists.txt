@@ -9,6 +9,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
+
 #file(GLOB_RECURSE SOURCES "src/*.cpp")
 set(SOURCES
         src/action.cpp
@@ -23,10 +24,13 @@ set(SOURCES
         src/edge/basic_road/basic_road_observation.cpp)
 
 # Define the executable and its source files
-add_library(traffic_model MODULE ${SOURCES})
+add_library(${PROJECT_NAME} MODULE ${SOURCES})
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "traffic_model")
+set_target_properties(traffic_model PROPERTIES PREFIX "")
+
 
 # Include directories
 include_directories(include)
 
 # Link libraries
-target_link_libraries(${PROJECT_NAME} PUBLIC pybind11::module)
+target_link_libraries(${PROJECT_NAME} PRIVATE pybind11::module)

@@ -25,7 +25,7 @@ int main()
 //    Node outNode = {"outNode"};
 //    BasicRoad road = {inNode, outNode, "road", 1000, 1};
 
-    TrafficModel trafficModel = TrafficModel::from_file("../tests/input/load_test.txt");
+    TrafficModel trafficModel = TrafficModel("../tests/input/load_test.txt");
     std::unique_ptr<Car> car = std::make_unique<Car>();
     auto& firstEdge = trafficModel.getEdge(0);
     auto& secondEdge = trafficModel.getEdge(1);

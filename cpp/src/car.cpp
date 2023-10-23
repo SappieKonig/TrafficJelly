@@ -34,11 +34,17 @@ void Car::accelerate(float dt)
 void Car::softBrake(float dt)
 {
     v -= 2 * dt;
+    if (v < 0) {
+        v = 0;
+    }
 }
 
 void Car::hardBrake(float dt)
 {
     v -= 10 * dt;
+    if (v < 0) {
+        v = 0;
+    }
 }
 
 void Car::toLeftLane()

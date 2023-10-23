@@ -16,7 +16,6 @@ private:
 public:
     BasicCity(std::string label, int population, float x, float y);
     int getPopulation() { return population; }
-    void collectCars() override;
     void distributeCars() override;
     void spawnCar();
     void step(float dt) override {

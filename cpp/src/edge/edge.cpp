@@ -28,11 +28,15 @@ void Edge::sortCars() {
     // because it may have been overtaken twice (or more).
     // Since we only have local changes, we can do this in O(n),
     // with practically zero memory cost.
-    for (auto it = cars.begin(); it != cars.end();) {
-        auto next = it;
-        next++;
-        if (next != cars.end() && (*it) > (*next)) {
+    for (auto it = cars.begin(); it != cars.end() && std::next(it) != cars.end(); ) {
+        auto next = std::next(it);
+        if (it->get()->getX() > next->get()->getX()) {
             std::iter_swap(it, next);
+            // Step back to re-check, unless we're at the beginning
+            if (it != cars.begin()) {
+                it = std::prev(it);
+                continue;
+            }
         }
         it = next;
     }

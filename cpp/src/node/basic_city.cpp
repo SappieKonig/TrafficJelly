@@ -14,14 +14,6 @@ BasicCity::BasicCity(std::string label, int population, float x, float y)
     rng = std::mt19937(rd());
 }
 
-void BasicCity::collectCars() {
-    for (auto& edge : inEdges)
-    {
-        auto exitingCars = edge.get().getExitingCars();
-        storedCars.insert(storedCars.end(), std::make_move_iterator(exitingCars.begin()), std::make_move_iterator(exitingCars.end()));
-    }
-}
-
 void BasicCity::distributeCars() {
     for (auto& car : storedCars) {
         // Choose a random edge to put the car on

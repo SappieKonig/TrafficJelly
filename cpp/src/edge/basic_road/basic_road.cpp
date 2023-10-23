@@ -44,11 +44,6 @@ void BasicRoad::setActions()
 
 }
 
-std::string BasicRoad::toString() const
-{
-    return "BasicRoad:" + label + "," + inNode.getLabel() + "," + outNode.getLabel() + "," + std::to_string(length);
-}
-
 void BasicRoad::enterCar(std::unique_ptr<Car>&& car)
 {
     car->syncCarToEdge(speedLimit);

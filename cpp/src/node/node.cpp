@@ -5,9 +5,10 @@
 #include <utility>
 #include <random>
 
-Node::Node(std::string label)
-    : label(std::move(label))
+Node::Node(std::string label, float x, float y)
+    : label(std::move(label)), x(x), y(y)
 {
+    id = -1;
 }
 
 

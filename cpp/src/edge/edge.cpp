@@ -3,11 +3,13 @@
 
 #include <iostream>
 
-Edge::Edge(Node& inNode, Node& outNode, std::string label, float length, float speedLimit)
-    : inNode(inNode), outNode(outNode), label(std::move(label)), length(length), speedLimit(speedLimit)
+Edge::Edge(Node& inNode, Node& outNode, std::string label, float speedLimit)
+    : inNode(inNode), outNode(outNode), label(std::move(label)), speedLimit(speedLimit)
 {
     inNode.outEdges.emplace_back(*this);
     outNode.inEdges.emplace_back(*this);
+    length = inNode.distanceTo(outNode);
+    id = -1;
 }
 
 Edge::~Edge()
@@ -55,4 +57,25 @@ std::vector<std::unique_ptr<Car>> Edge::getExitingCars() {
         }
     }
     return exiting_cars;
+}
+
+std::tuple<std::vector<int>, std::vector<float>> Edge::getCarCountHist(float bin_distance) const
+{
+    std::vector<int> counts;
+    std::vector<float> bins;
+    float distance = 0;
+    auto car = cars.begin();
+    int count = 0;
+    while (distance < length) {
+        bins.push_back(distance);
+        while (car != cars.end() && (*car)->getX() < distance + bin_distance) {
+            count++;
+            car++;
+        }
+        counts.push_back(count);
+        count = 0;
+        distance += bin_distance;
+    }
+    bins.push_back(length);
+    return std::make_tuple(counts, bins);
 }

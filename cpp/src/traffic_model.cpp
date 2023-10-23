@@ -1,5 +1,6 @@
 #include "traffic_model.h"
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 //#include "visualizer.h"
 #include "car.h"
 #include "edge/basic_road/basic_road.h"
@@ -11,24 +12,61 @@
 #include <utility>
 #include <vector>
 
-TrafficModel::TrafficModel(std::string fn)
+TrafficModel::TrafficModel(std::string fn, float delta_time)
+    : delta_time(delta_time)
 {
     std::ifstream file(fn);
     std::string str(std::istreambuf_iterator<char>{file}, {});
     auto builder = TrafficModelBuilder(*this);
     builder.build(str);
+    std::cout << "TrafficModel built.\n";
+    std::cout << "Nodes: " << nodes.size() << "\n";
+    std::cout << "Edges: " << edges.size() << "\n";
+    setIDs();
 }
 
-void TrafficModel::step(float dt)
+void TrafficModel::step()
 {
     for (auto& node : nodes)
     {
-        node->step(dt);
+        node->step(delta_time);
     }
     for (auto& edge : edges)
     {
-        edge->step(dt);
+        edge->step(delta_time);
     }
+    transferCars();
+}
+
+void TrafficModel::setIDs() {
+    int id = 0;
+    for (auto& node : nodes)
+    {
+        node->setID(id++);
+    }
+    id = 0;
+    for (auto& edge : edges)
+    {
+        edge->setID(id++);
+    }
+}
+
+std::vector<int> TrafficModel::getEdgeIDs() {
+    std::vector<int> ids;
+    for (auto& edge : edges)
+    {
+        ids.push_back(edge->getID());
+    }
+    return ids;
+}
+
+std::vector<int> TrafficModel::getNodeIDs() {
+    std::vector<int> ids;
+    for (auto& node : nodes)
+    {
+        ids.push_back(node->getID());
+    }
+    return ids;
 }
 
 void TrafficModel::transferCars() {
@@ -54,17 +92,17 @@ void TrafficModel::display() const
     }
 }
 
-void TrafficModelBuilder::addBasicCity(std::string label, int population) {
-    std::shared_ptr<Node> node = std::make_shared<BasicCity>(label, population);
+void TrafficModelBuilder::addBasicCity(std::string label, int population, float x, float y) {
+    std::shared_ptr<Node> node = std::make_shared<BasicCity>(label, population, x, y);
     trafficModel.nodes.emplace_back(node);
     trafficModel.labelToNode[label] = node;
 }
 
-void TrafficModelBuilder::addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float length, float speedLimit, int nLanes)
+void TrafficModelBuilder::addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float speedLimit, int nLanes)
 {
     std::shared_ptr<Node> inNode = trafficModel.labelToNode[inNodeLabel];
     std::shared_ptr<Node> outNode = trafficModel.labelToNode[outNodeLabel];
-    std::shared_ptr<Edge> edge = std::make_shared<BasicRoad>(*inNode, *outNode, label, length, speedLimit, nLanes);
+    std::shared_ptr<Edge> edge = std::make_shared<BasicRoad>(*inNode, *outNode, label, speedLimit, nLanes);
     trafficModel.edges.emplace_back(edge);
     trafficModel.labelToEdge[label] = edge;
 }
@@ -79,7 +117,7 @@ BasicCityStringCommand::BasicCityStringCommand(TrafficModelBuilder& trafficModel
 
 void BasicCityStringCommand::apply(std::vector<std::string>& args) const
 {
-    trafficModelBuilder.addBasicCity(args[0], std::stoi(args[1]));
+    trafficModelBuilder.addBasicCity(args[0], std::stoi(args[1]), std::stof(args[2]), std::stof(args[3]));
 }
 
 BasicRoadStringCommand::BasicRoadStringCommand(TrafficModelBuilder& trafficModelBuilder)
@@ -87,7 +125,7 @@ BasicRoadStringCommand::BasicRoadStringCommand(TrafficModelBuilder& trafficModel
 
 void BasicRoadStringCommand::apply(std::vector<std::string>& args) const
 {
-    trafficModelBuilder.addBasicRoad(args[0], args[1], args[2], std::stof(args[3]), std::stof(args[4]), std::stoi(args[5]));
+    trafficModelBuilder.addBasicRoad(args[0], args[1], args[2], std::stof(args[3]), std::stoi(args[4]));
 }
 
 TrafficModelBuilder::TrafficModelBuilder(TrafficModel& trafficModel)
@@ -133,8 +171,16 @@ void TrafficModelBuilder::build(std::string file_content)
 
 PYBIND11_MODULE(traffic_model, m) {
     pybind11::class_<TrafficModel>(m, "TrafficModel")
-        .def(pybind11::init<const std::string &>())
+        .def(pybind11::init<const std::string &, float>())
         .def("step", &TrafficModel::step)
-        .def("display", &TrafficModel::display);
+        .def("display", &TrafficModel::display)
+        .def("get_edge_ids", &TrafficModel::getEdgeIDs)
+        .def("get_node_ids", &TrafficModel::getNodeIDs)
+        .def("get_edge_road_length", &TrafficModel::getEdgeRoadLength)
+        .def("get_edge_start_node_id", &TrafficModel::getEdgeStartNodeID)
+        .def("get_edge_end_node_id", &TrafficModel::getEdgeEndNodeID)
+        .def("get_node_pos", &TrafficModel::getNodePosition)
+        .def("get_car_count_histogram_in_edge", &TrafficModel::getCarCountHistInEdge)
+        .def("get_car_count_in_node", &TrafficModel::getCarCountInNode);
 }
 

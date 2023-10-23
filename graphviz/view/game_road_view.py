@@ -94,12 +94,12 @@ class GameRoadView(GameView):
 
     def update_state(self):
         while self.game.state.alpha >= 2:
-            self.simulation.step_forward()
+            self.simulation.step()
             self.game.state.alpha -= 1
         if self.game.state.alpha >= 1:
             interval = self.get_displayed_cars_interval()
             self.state.prev_cars = self.get_graphics_cars(interval)
-            self.simulation.step_forward()
+            self.simulation.step()
             self.game.state.alpha -= 1
             self.state.next_cars = self.get_graphics_cars(interval)
 

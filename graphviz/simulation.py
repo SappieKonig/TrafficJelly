@@ -76,7 +76,7 @@ class Simulation:
     def get_delta_time(self) -> float:
         return self.__dt
 
-    def step_forward(self):
+    def step(self):
         arrived_car_ids_per_edge: dict[int, list[int]] = defaultdict(list)
         departed_car_ids_per_node: dict[int, list[int]] = defaultdict(list)
 

@@ -107,7 +107,7 @@ class GameGraphView(GameView):
 
     def update_state(self):
         while self.game.state.alpha >= 1:
-            self.simulation.step_forward()
+            self.simulation.step()
             self.game.state.alpha -= 1
 
     def render(self):

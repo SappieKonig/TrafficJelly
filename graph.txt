@@ -1,0 +1,6 @@
+BasicCity:A,100000,0,5000
+BasicCity:B,200000,-5000,-5000
+BasicCity:C,300000,5000,-5000
+BasicRoad:AB,A,B,25,2
+BasicRoad:BC,B,C,25,2
+BasicRoad:CA,C,A,25,2

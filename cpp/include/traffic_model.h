@@ -27,6 +27,7 @@ class TrafficModel
 {
 private:
 // Holds all information of the model.
+    float delta_time;
     std::vector<std::shared_ptr<Node>> nodes;
 
     std::vector<Route> routes;
@@ -37,9 +38,9 @@ private:
     std::shared_ptr<Visualizer> visualizer; // The visualiser is shared pointer and not unique to enable downcasts. We currently only use basic visualization.
     std::vector<std::shared_ptr<Edge>> edges;
 public:
-    TrafficModel(std::string fn);
+    TrafficModel(std::string fn, float delta_time);
     // Model usage and interpretation
-    void step(float dt);
+    void step();
     void transferCars();
     void display() const; // Only reasonably used, if small graph
     // getFirstEdge
@@ -47,6 +48,27 @@ public:
         return *edges[idx];
     }
     friend TrafficModelBuilder;
+    void setIDs();
+    std::vector<int> getEdgeIDs();
+    std::vector<int> getNodeIDs();
+    float getEdgeRoadLength(int idx) {
+        return edges[idx]->getLength();
+    }
+    int getEdgeStartNodeID(int idx) {
+        return edges[idx]->getInNode().getID();
+    }
+    int getEdgeEndNodeID(int idx) {
+        return edges[idx]->getOutNode().getID();
+    }
+    std::tuple<float, float> getNodePosition(int idx) {
+        return nodes[idx]->getPosition();
+    }
+    std::tuple<std::vector<int>, std::vector<float>> getCarCountHistInEdge(int idx, float bin_distance) {
+        return edges[idx]->getCarCountHist(bin_distance);
+    }
+    int getCarCountInNode(int idx) {
+        return nodes[idx]->getNCars();
+    }
 };
 
 /*
@@ -93,8 +115,8 @@ private:
 public:
     TrafficModelBuilder(TrafficModel& trafficModel);
     void build(std::string file_content);
-    void addBasicCity(std::string label, int population);
-    void addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float length, float speedLimit, int nLanes);
+    void addBasicCity(std::string label, int population, float x, float y);
+    void addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float speedLimit, int nLanes);
 
     friend BasicRoadStringCommand;
     friend BasicCityStringCommand;

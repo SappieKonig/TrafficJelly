@@ -10,8 +10,8 @@
 #include "algorithm"
 #include "node/node.h"
 
-BasicRoad::BasicRoad(Node& inNode, Node& outNode, std::string label, float length, float speedLimit, int nLanes)
-        : Edge(inNode, outNode, std::move(label), length, speedLimit),  nLanes(nLanes)
+BasicRoad::BasicRoad(Node& inNode, Node& outNode, std::string label, float speedLimit, int nLanes)
+        : Edge(inNode, outNode, std::move(label), speedLimit),  nLanes(nLanes)
 {
 
 }

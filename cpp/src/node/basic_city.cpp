@@ -3,9 +3,12 @@
 //
 
 #include "node/basic_city.h"
+#include "car.h"
 
-BasicCity::BasicCity(std::string label, int population)
-    : Node(label), population(population)
+#include <utility>
+
+BasicCity::BasicCity(std::string label, int population, float x, float y)
+    : Node(std::move(label), x, y), population(population)
 {
     std::random_device rd;
     rng = std::mt19937(rd());
@@ -27,4 +30,10 @@ void BasicCity::distributeCars() {
         outEdges[index].get().enterCar(std::move(car));
     }
     storedCars.clear();
+}
+
+void BasicCity::spawnCar() {
+    std::unique_ptr<Car> car = std::make_unique<Car>();
+    // Put the car on the storedCars list
+    storedCars.push_back(std::move(car));
 }

@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
-
+#include <tuple>
 #include "utils.h"
 //#include "observation.h"
 #include "visualizer.h"
@@ -23,15 +23,16 @@ class Edge
 protected:
     // To keep track of every car in the driving order.
     std::list<std::unique_ptr<Car>> cars;
-    float const length; // In meters
+    float length; // In meters
     float const speedLimit; // in m/s
+    int id;
 
     Node& inNode;
     Node& outNode;
     std::string const label;
 
 public:
-    Edge(Node& inNode, Node& outNode, std::string label, float length, float speedLimit);
+    Edge(Node& inNode, Node& outNode, std::string label, float speedLimit);
     virtual ~Edge();
     virtual void setActions() = 0;
     virtual std::string toString() const = 0;
@@ -46,6 +47,12 @@ public:
     }
     std::string getLabel() const;
     int getNCars() const { return cars.size(); }
+    int getID() const { return id; }
+    void setID(int id) { this->id = id; }
+    float getLength() const { return length; }
+    Node& getInNode() const { return inNode; }
+    Node& getOutNode() const { return outNode; }
+    std::tuple<std::vector<int>, std::vector<float>> getCarCountHist(float bin_distance) const;
 };
 
 

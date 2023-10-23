@@ -27,13 +27,13 @@ TrafficModel::TrafficModel(std::string fn, float delta_time)
 
 void TrafficModel::step()
 {
-    for (auto& node : nodes)
-    {
-        node->step(delta_time);
-    }
     for (auto& edge : edges)
     {
         edge->step(delta_time);
+    }
+    for (auto& node : nodes)
+    {
+        node->step(delta_time);
     }
     transferCars();
 }

@@ -54,11 +54,18 @@ void Edge::updateCars(float dt)
 std::vector<std::unique_ptr<Car>> Edge::getExitingCars() {
     std::vector<std::unique_ptr<Car>> exiting_cars;
     // Loop from back to front
+    int cars_removed = 0;
     for (auto car = cars.rbegin(); car != cars.rend(); ++car) {
         if ((*car)->getX() > length) {
             exiting_cars.push_back(std::move(*car));
-            cars.pop_back();
+            cars_removed++;
         }
+        else {
+            break;
+        }
+    }
+    for (int i = 0; i < cars_removed; ++i) {
+        cars.pop_back();
     }
     return exiting_cars;
 }

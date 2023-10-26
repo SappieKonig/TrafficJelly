@@ -35,6 +35,7 @@ private:
 
     // Decision maker for graph traversal
 //    std::unique_ptr<RoutePlanner> routePlanner;
+//    Checkpoint checkpoint;
 
 public:
 //    Car(std::unique_ptr<RoutePlanner> routePlanner);
@@ -53,6 +54,7 @@ public:
 
 //    std::shared_ptr<Checkpoint> nextCheckpoint();
 //    std::shared_ptr<Checkpoint> getTargetCheckpoint();
+
     // Friend all actions that need internal parameters
     friend CruiseAction;
     friend HardBrakeAction;
@@ -73,7 +75,6 @@ public:
     friend bool operator<(Car const& left, Car const& right);
 
     static std::default_random_engine generator;
-
     static std::normal_distribution<double> normalDistribution;
 };
 

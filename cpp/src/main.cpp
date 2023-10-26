@@ -25,7 +25,7 @@ int main()
 //    Node outNode = {"outNode"};
 //    BasicRoad road = {inNode, outNode, "road", 1000, 1};
 
-    TrafficModelFileDirector director("../tests/input/load_test.txt");
+    TrafficModelFileDirector director("tests/input/load_test.txt");
     TrafficModel trafficModel = director.build();
     std::unique_ptr<Car> car = std::make_unique<Car>();
     auto& firstEdge = trafficModel.getEdge(0);
@@ -36,9 +36,9 @@ int main()
     {
         trafficModel.step(dt);
         trafficModel.transferCars();
-        std::cout << firstEdge.getNCars() << ", " << secondEdge.getNCars() << ", " << thirdEdge.getNCars() << "\n";
+        //std::cout << firstEdge.getNCars() << ", " << secondEdge.getNCars() << ", " << thirdEdge.getNCars() << "\n";
     }
-//    trafficModel.showRoutes();
+    trafficModel.showRoutes();
     trafficModel.display();
 //    trafficModel.spawnAt("A");
 //    trafficModel.step(dt);

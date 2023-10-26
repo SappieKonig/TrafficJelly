@@ -4,6 +4,7 @@
 
 #include "edge/basic_road/basic_road.h"
 
+#include <string>
 #include <utility>
 #include "edge/basic_road/basic_road_observation.h"
 #include "car.h"
@@ -46,7 +47,7 @@ void BasicRoad::setActions()
 
 std::string BasicRoad::toString() const
 {
-    return "BasicRoad:" + label + "," + inNode.getLabel() + "," + outNode.getLabel() + "," + std::to_string(length);
+    return "BasicRoad:" + label + "," + inNode.getLabel() + "," + outNode.getLabel() + "," + std::to_string(length) + "," + std::to_string(speedLimit) + "," + std::to_string(nLanes);
 }
 
 void BasicRoad::enterCar(std::unique_ptr<Car>&& car)

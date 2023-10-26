@@ -9,16 +9,19 @@
 #define TRAFFICJELLY_BASIC_CITY_H
 
 
-class BasicCity : public Node {
+class BasicCity : public Node
+{
 private:
     int population;
     std::mt19937 rng;
+
 public:
     BasicCity(std::string label, int population);
     int getPopulation() { return population; }
     void collectCars() override;
     void distributeCars() override;
     void step(float dt) override {}
+    std::string toString() const override;
 };
 
 

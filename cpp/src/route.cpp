@@ -1,38 +1,40 @@
 #include "route.h"
 #include "edge/edge.h"
 #include "node/node.h"
+#include <memory>
 
-Checkpoint::Checkpoint(Node const& node, Edge& edgeToNode, float waitDurationBeforeEdge) // Part of the very sneaky workaround
+Checkpoint::Checkpoint(std::shared_ptr<Node const> const node, std::shared_ptr<Edge const> const edgeToNode, float const waitDurationBeforeEdge)
     : node(node), edgeToNode(edgeToNode), waitDurationBeforeEdge(waitDurationBeforeEdge)
 {
 
 }
 
-void Route::show() // Those dashes are kind of ugly
+void Route::show() const// Those dashes are kind of ugly
 {
-    for (Checkpoint& checkpoint : checkpoints)
+    for (Checkpoint const& checkpoint : checkpoints)
     {
-        std::cout << "-Road " << checkpoint.edgeToNode.getLabel() << "\n";
-        std::cout << "-City " << checkpoint.node.getLabel() << "\n";
+        std::cout << "-Road " << checkpoint.edgeToNode->getLabel() << "\n";
+        std::cout << "-City " << checkpoint.node->getLabel() << "\n";
     }
 }
 
 std::string Route::toString() const
 {
+    int end = checkpoints.size() - 1;
     std::string times;
     std::string nodes;
     std::string edges;
-    for (int i = 0; i < checkpoints.size() - 1; i++)
+    for (int i = 0; i < end; i++)
     {
         times += "," + std::to_string(checkpoints[i].waitDurationBeforeEdge);
-        nodes += "," + checkpoints[i].node.getLabel();
-        edges += "," + checkpoints[i].edgeToNode.getLabel();
+        nodes += "," + checkpoints[i].node->getLabel();
+        edges += "," + checkpoints[i].edgeToNode->getLabel();
     }
 
     std::string str;
-    str += "RouteTimes:" + std::to_string(checkpoints[0].waitDurationBeforeEdge) + times + "\n";
-    str += "RouteNodes:" + checkpoints[0].node.getLabel() + nodes + "\n";
-    str += "RouteEdges:" + checkpoints[0].edgeToNode.getLabel() + edges + "\n";
+    str += "RouteTimes:" + std::to_string(checkpoints[end].waitDurationBeforeEdge) + times + "\n";
+    str += "RouteNodes:" + checkpoints[end].node->getLabel() + nodes + "\n";
+    str += "RouteEdges:" + checkpoints[end].edgeToNode->getLabel() + edges + "\n";
     str += "Route:";
     return str;
 }

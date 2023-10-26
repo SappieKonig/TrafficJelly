@@ -19,19 +19,20 @@
  * It carries a Car instance from any inEdge to an outEdge of its choice (after indefinite hold).
  * It may also act as source or sink of cars on the graph.
  */
-
 class Node {
+protected:
     std::string const label;
 
 public:
     Node(std::string label);
-    std::string getLabel() { return label; }
+    std::string getLabel() const { return label; }
     std::vector<std::reference_wrapper<Edge>> inEdges; // ref
     std::vector<std::reference_wrapper<Edge>> outEdges;
     std::vector<std::unique_ptr<Car>> storedCars;
     virtual void collectCars() = 0;
     virtual void distributeCars() = 0;
     virtual void step(float dt) = 0;
+    virtual std::string toString() const = 0;
 };
 
 //class Node

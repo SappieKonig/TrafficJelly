@@ -10,8 +10,6 @@ Node::Node(std::string label)
 {
 }
 
-
-
 //Node::~Node()
 //{
 //

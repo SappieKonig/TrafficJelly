@@ -1,6 +1,6 @@
 #include "route.h"
-#include "edge/edge.h"
-#include "node/node.h"
+#include "edge.h"
+#include "node.h"
 #include <memory>
 
 Checkpoint::Checkpoint(std::shared_ptr<Node const> const node, std::shared_ptr<Edge const> const edgeToNode, float const waitDurationBeforeEdge)

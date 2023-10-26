@@ -4,16 +4,15 @@
 #include <random>
 #include <iostream>
 //#include <vector>
-//#include "edge/edge.h"
+//#include "edge.h"
 
 
 std::default_random_engine Car::generator(time(0));
 std::normal_distribution<double> Car::normalDistribution(30, 3);
 
-
 Car::Car()
 {
-    v = (float) normalDistribution(generator);
+    v = normalDistribution(generator);
     offset = 0;
     lane = 0;
 }

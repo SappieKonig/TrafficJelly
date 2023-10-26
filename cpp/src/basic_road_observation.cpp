@@ -3,7 +3,8 @@
 //
 
 #include <cstdlib>
-#include "edge/basic_road/basic_road_observation.h"
+#include "basic_road_observation.h"
+#include "car.h"
 
 Observation::Observation(std::vector<std::reference_wrapper<Car>> const& cars,
                          std::unique_ptr<Car> const& ego,

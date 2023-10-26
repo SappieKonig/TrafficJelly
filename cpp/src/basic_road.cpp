@@ -2,14 +2,14 @@
 // Created by sappie on 10-10-23.
 //
 
-#include "edge/basic_road/basic_road.h"
+#include "basic_road.h"
 
 #include <string>
 #include <utility>
-#include "edge/basic_road/basic_road_observation.h"
+#include "basic_road_observation.h"
 #include "car.h"
 #include "algorithm"
-#include "node/node.h"
+#include "node.h"
 
 BasicRoad::BasicRoad(Node& inNode, Node& outNode, std::string label, float length, float speedLimit, int nLanes)
         : Edge(inNode, outNode, std::move(label), length, speedLimit),  nLanes(nLanes)

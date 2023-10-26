@@ -11,8 +11,8 @@
 
 #include "utils.h"
 #include "car.h"
-#include "node/node.h"
-#include "edge/edge.h"
+#include "node.h"
+#include "edge.h"
 #include "visualizer.h"
 #include "route.h"
 

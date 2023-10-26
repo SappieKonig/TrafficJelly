@@ -3,7 +3,7 @@
 //
 #include <random>
 
-#include "node/node.h"
+#include "node.h"
 
 #ifndef TRAFFICJELLY_BASIC_CITY_H
 #define TRAFFICJELLY_BASIC_CITY_H

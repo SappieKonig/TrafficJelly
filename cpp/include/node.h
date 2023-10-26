@@ -10,7 +10,7 @@
 
 #include "utils.h"
 #include "car.h"
-#include "edge/edge.h"
+#include "edge.h"
 #include "visualizer.h"
 
 /*

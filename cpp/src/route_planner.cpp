@@ -1,5 +1,5 @@
 #include "route_planner.h"
-#include "node/node.h"
+#include "node.h"
 
 RoutePlanner::~RoutePlanner()
 {

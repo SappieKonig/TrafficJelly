@@ -4,6 +4,7 @@
 #include "basic_road_dynamics.h"
 #include <random>
 #include <memory>
+#include "car_parameters.h"
 #include "utils.h"
 #include "route_planner.h"
 #include "action.h"
@@ -24,36 +25,30 @@ class CompositeAction;
 class Car
 {
 private:
-    float x = 0; // in m
-    float baseTarget = 0; // in m/s
-    float v; // in m/s (starts at speed limit of current edge (or maybe not, idfk))
-    float offset = 0; // in m/s (to be added to v, with respect to the speed limit)
-    int lane; // in number of lanes (starts at 0) (lane 0 is the rightmost lane)
-
+    CarParameters params;
     std::unique_ptr<Action> action = nullptr;
     BasicRoadDynamics dynamics = {};
 
     // Decision maker for graph traversal
-    //std::unique_ptr<RoutePlanner> routePlanner;
-    //Checkpoint checkpoint;
+    std::unique_ptr<RoutePlanner> routePlanner;
 
 public:
-    Car();
-    //Car(std::unique_ptr<RoutePlanner> routePlanner);
+    Car(CarParameters params, std::unique_ptr<RoutePlanner> routePlanner);
     void syncCarToEdge(float targetSpeed) {
-        baseTarget = targetSpeed;
-        x = 0;
+        params.baseTarget = targetSpeed;
+        params.x = 0;
     }
     void updateAction(Observation const& observation);
     void step(float dt);
 
-    float getX() const { return x; }
-    float getV() const { return v; }
-    int getLane() const { return lane; }
-    float getMargin() const { return 20 + 35 * v / 30; }
+    float getX() const { return params.x; }
+    float getV() const { return params.v; }
+    int getLane() const { return params.lane; }
+    float getMargin() const { return 20 + 35 * params.v / 30; }
 
-    //std::shared_ptr<Checkpoint> nextCheckpoint();
-    //std::shared_ptr<Checkpoint> getTargetCheckpoint();
+    bool hasTerminated() const;
+    void nextCheckpoint();
+    std::unique_ptr<Checkpoint>& getTargetCheckpoint();
 
     // Friend all actions that need internal parameters
     friend CruiseAction;
@@ -62,7 +57,7 @@ public:
     friend ToRightLaneAction;
     friend CompositeAction;
 
-    float getTarget() const { return baseTarget + offset; }
+    float getTarget() const { return params.baseTarget + params.offset; }
 
     void accelerate(float dt);
     void softBrake(float dt);
@@ -73,9 +68,6 @@ public:
 
     // Necessary for data-locality motivated sorting of the cars
     friend bool operator<(Car const& left, Car const& right);
-
-    static std::default_random_engine generator;
-    static std::normal_distribution<double> normalDistribution;
 };
 
 /*
@@ -84,21 +76,21 @@ public:
  * We may also decide to make Car abstract and split it into trucks and other stuff with different functionality.
  * Then, the car factory may have creation methods for such objects.
  */
-//class CarFactory
-//{
-//public:
-//    virtual std::unique_ptr<Car> createCar() = 0;
-//};
-//
-//class BasicCarFactory : public CarFactory
-//{
-//private:
-//    RouteSampler routeSampler;
-//    std::default_random_engine generator;
-//
-//public:
-//    BasicCarFactory(std::vector<Route>& routes, std::random_device& seed);
-//    std::unique_ptr<Car> createCar() override;
-//};
+class CarFactory
+{
+public:
+    virtual std::unique_ptr<Car> createCar() = 0;
+};
+
+class BasicCarFactory : public CarFactory
+{
+private:
+    RouteSampler routeSampler;
+    std::default_random_engine generator;
+
+public:
+    BasicCarFactory(std::shared_ptr<std::vector<Route>> routes, std::shared_ptr<std::random_device> device);
+    std::unique_ptr<Car> createCar() override;
+};
 
 #endif

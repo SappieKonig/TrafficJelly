@@ -1,7 +1,3 @@
-//
-// Created by sappie on 10-10-23.
-//
-
 #include <cstdlib>
 #include "basic_road_observation.h"
 #include "car.h"

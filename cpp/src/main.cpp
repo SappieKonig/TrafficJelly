@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <memory>
 
 #include "basic_road.h"
 #include "traffic_model.h"
@@ -25,18 +26,21 @@ int main()
 //    Node outNode = {"outNode"};
 //    BasicRoad road = {inNode, outNode, "road", 1000, 1};
 
-    TrafficModelFileDirector director("tests/input/load_test.txt");
+    std::shared_ptr<std::random_device> device = std::make_shared<std::random_device>();
+    TrafficModelFileDirector director(device, "tests/output/save_test.txt");
     TrafficModel trafficModel = director.build();
-    std::unique_ptr<Car> car = std::make_unique<Car>();
-    auto& firstEdge = trafficModel.getEdge(0);
-    auto& secondEdge = trafficModel.getEdge(1);
-    auto& thirdEdge = trafficModel.getEdge(2);
-    firstEdge.enterCar(std::move(car));
+    auto& firstEdge1 = trafficModel.getEdge("A2-1");
+    auto& firstEdge2 = trafficModel.getEdge("A2-2");
+    auto& secondEdge1 = trafficModel.getEdge("A4-1");
+    auto& secondEdge2 = trafficModel.getEdge("A4-2");
+    auto& thirdEdge1 = trafficModel.getEdge("A12-1");
+    auto& thirdEdge2 = trafficModel.getEdge("A12-2");
+    trafficModel.spawnCar("Utrecht");
     for (int i = 0; i < 10000; i++)
     {
         trafficModel.step(dt);
         trafficModel.transferCars();
-        //std::cout << firstEdge.getNCars() << ", " << secondEdge.getNCars() << ", " << thirdEdge.getNCars() << "\n";
+        std::cout << firstEdge2.getNCars() << ", " << secondEdge1.getNCars() << ", " << thirdEdge1.getNCars() << "\n";
     }
     trafficModel.showRoutes();
     trafficModel.display();

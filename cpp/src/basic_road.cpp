@@ -1,7 +1,3 @@
-//
-// Created by sappie on 10-10-23.
-//
-
 #include "basic_road.h"
 
 #include <string>
@@ -12,7 +8,7 @@
 #include "node.h"
 
 BasicRoad::BasicRoad(Node& inNode, Node& outNode, std::string label, float length, float speedLimit, int nLanes)
-        : Edge(inNode, outNode, std::move(label), length, speedLimit),  nLanes(nLanes)
+    : Edge(inNode, outNode, std::move(label), length, speedLimit),  nLanes(nLanes)
 {
 
 }
@@ -42,7 +38,6 @@ void BasicRoad::setActions()
         Observation obs = {nearby_cars, *base_car, nLanes};
         (*base_car)->updateAction(obs);
     }
-
 }
 
 std::string BasicRoad::toString() const

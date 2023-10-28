@@ -11,11 +11,11 @@
  */
 struct Checkpoint
 {
-    std::shared_ptr<Node const> const node;
-    std::shared_ptr<Edge const> const edgeToNode;
+    std::shared_ptr<Node const> const node; // Bestaat puur voor label of zo.
+    std::shared_ptr<Edge> const edgeToNode; // Alles is kut. TODO: idfk anymore.
     float const waitDurationBeforeEdge;
 
-    Checkpoint(std::shared_ptr<Node const> const node, std::shared_ptr<Edge const> const edgeToNode, float const waitDurationBeforeEdge);
+    Checkpoint(std::shared_ptr<Node const> const node,std::shared_ptr<Edge> const edgeToNode, float const waitDurationBeforeEdge);
 };
 
 /*
@@ -35,12 +35,12 @@ struct Route
 class RouteSampler
 {
 private:
-    std::random_device device;
+    std::shared_ptr<std::random_device> device;
     std::default_random_engine generator;
-    std::vector<Route>& routes;
+    std::shared_ptr<std::vector<Route>> routes;
 
 public:
-    RouteSampler(std::vector<Route>& routes, std::random_device& device);
+    RouteSampler(std::shared_ptr<std::vector<Route>> routes, std::shared_ptr<std::random_device> device);
     Route& select();
     void showRoutes();
 };

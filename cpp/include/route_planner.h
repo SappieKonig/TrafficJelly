@@ -13,7 +13,9 @@ class RoutePlanner
 {
 public:
     virtual ~RoutePlanner();
-    virtual std::shared_ptr<Checkpoint> nextCheckpoint() = 0;
+    virtual bool hasTerminated() const = 0;
+    virtual void nextCheckpoint() = 0;
+    virtual std::unique_ptr<Checkpoint>& getTargetCheckpoint() = 0;
     virtual void showRoute() = 0;
 };
 
@@ -27,12 +29,14 @@ class BasicRoutePlanner : public RoutePlanner
 private:
     Route& route; // Maybe extend to hold multiple routes, or allow for perturbations.
     int checkpointIndex = 0;
+    std::unique_ptr<Checkpoint> targetCheckpoint;
 
 public:
     BasicRoutePlanner(Route& route);
-    std::shared_ptr<Checkpoint> nextCheckpoint() override;
+    bool hasTerminated() const override;
+    void nextCheckpoint() override;
+    std::unique_ptr<Checkpoint>& getTargetCheckpoint() override;
     void showRoute() override;
 };
-
 
 #endif

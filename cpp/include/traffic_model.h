@@ -2,6 +2,7 @@
 #define WORLD_H
 
 #include <functional>
+#include <random>
 #include <unordered_map>
 #include <vector>
 #include <fstream>
@@ -29,7 +30,7 @@ class TrafficModel
 private:
     // Holds all information of the model.
     std::vector<std::shared_ptr<Node>> nodes;
-    std::vector<Route> routes;
+    std::shared_ptr<std::vector<Route>> routes = std::make_shared<std::vector<Route>>();
     // Convenient utility for users
     std::unordered_map<std::string, std::shared_ptr<Node>> labelToNode;
 
@@ -37,7 +38,9 @@ private:
     std::shared_ptr<Visualizer> visualizer; // The visualiser is shared pointer and not unique to enable downcasts. We currently only use basic visualization.
     std::vector<std::shared_ptr<Edge>> edges;
 
-    TrafficModel();
+    std::shared_ptr<std::random_device> device;
+
+    TrafficModel(std::shared_ptr<std::random_device> device);
 
 public:
     // Model usage and interpretation
@@ -45,9 +48,9 @@ public:
     void transferCars();
     void display() const; // Only reasonably used, if small graph
     void showRoutes() const;
-    // getFirstEdge
-    Edge& getEdge(int idx) {
-        return *edges[idx];
+    void spawnCar(std::string label);
+    Edge& getEdge(std::string label) {
+        return *labelToEdge[label];
     }
     friend TrafficModelBuilder;
 };
@@ -61,9 +64,10 @@ class TrafficModelBuilder
 {
 private:
     TrafficModel trafficModel;
-    std::random_device device;
+    std::shared_ptr<std::random_device> device;
 
 public:
+    TrafficModelBuilder(std::shared_ptr<std::random_device> device);
     void addBasicCity(std::string label, int population);
     void addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float length, float speedLimit, int nLanes);
     void addRoute(std::vector<std::string> nodesAlongRoute, std::vector<std::string> edgesAlongRoute, std::vector<float> waitingTimesAlongRoute);
@@ -160,7 +164,7 @@ private:
     std::vector<float> waitingTimesAlongRoute;
 
 public:
-    TrafficModelStringDirector(std::string fn);
+    TrafficModelStringDirector(std::shared_ptr<std::random_device> device, std::string fn);
     TrafficModel build();
     void addBasicCity(std::vector<std::string>& args); // Not safe, if existent label. Also, probably should add argument object for more clarity of the parameters in code. Is getting tedious though.
     void addBasicRoad(std::vector<std::string>& args);
@@ -181,9 +185,10 @@ class TrafficModelFileDirector
 {
 private:
     std::string fn;
+    std::shared_ptr<std::random_device> device;
 
 public:
-    TrafficModelFileDirector(std::string fn);
+    TrafficModelFileDirector(std::shared_ptr<std::random_device> random_device, std::string fn);
     TrafficModel build();
 };
 

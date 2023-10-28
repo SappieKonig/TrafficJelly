@@ -5,8 +5,8 @@
 #ifndef CPP_SIMPLE_ROAD_H
 #define CPP_SIMPLE_ROAD_H
 
-#include "edge/edge.h"
-#include "node/node.h"
+#include "edge.h"
+#include "node.h"
 
 
 class BasicRoad : public Edge

@@ -1,7 +1,7 @@
 #ifndef CAR_H
 #define CAR_H
 
-#include "edge/basic_road/basic_road_dynamics.h"
+#include "basic_road_dynamics.h"
 #include <random>
 #include <memory>
 #include "utils.h"
@@ -34,12 +34,12 @@ private:
     BasicRoadDynamics dynamics = {};
 
     // Decision maker for graph traversal
-//    std::unique_ptr<RoutePlanner> routePlanner;
-//    Checkpoint checkpoint;
+    //std::unique_ptr<RoutePlanner> routePlanner;
+    //Checkpoint checkpoint;
 
 public:
-//    Car(std::unique_ptr<RoutePlanner> routePlanner);
     Car();
+    //Car(std::unique_ptr<RoutePlanner> routePlanner);
     void syncCarToEdge(float targetSpeed) {
         baseTarget = targetSpeed;
         x = 0;
@@ -52,8 +52,8 @@ public:
     int getLane() const { return lane; }
     float getMargin() const { return 20 + 35 * v / 30; }
 
-//    std::shared_ptr<Checkpoint> nextCheckpoint();
-//    std::shared_ptr<Checkpoint> getTargetCheckpoint();
+    //std::shared_ptr<Checkpoint> nextCheckpoint();
+    //std::shared_ptr<Checkpoint> getTargetCheckpoint();
 
     // Friend all actions that need internal parameters
     friend CruiseAction;

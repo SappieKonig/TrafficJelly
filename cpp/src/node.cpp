@@ -1,5 +1,4 @@
-#include "node/node.h"
-
+#include "node.h"
 #include <iostream>
 #include <utility>
 #include <random>

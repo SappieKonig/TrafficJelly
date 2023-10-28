@@ -3,8 +3,8 @@
 #include <pybind11/stl.h>
 //#include "visualizer.h"
 #include "car.h"
-#include "edge/basic_road/basic_road.h"
-#include "node/basic_city.h"
+#include "basic_road.h"
+#include "basic_city.h"
 
 #include <algorithm>
 #include <iostream>

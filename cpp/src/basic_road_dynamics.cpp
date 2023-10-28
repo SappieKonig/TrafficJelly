@@ -5,12 +5,12 @@
 #include <vector>
 
 #include "action.h"
-#include "edge/basic_road/basic_road_dynamics.h"
+#include "basic_road_dynamics.h"
+#include "car.h"
 
 
-
-std::unique_ptr<Action> BasicRoadDynamics::getAction(const Observation &observation,
-                                                     const Car &ego) {
+std::unique_ptr<Action> BasicRoadDynamics::getAction(const Observation& observation,
+                                                     const Car& ego) {
     float margin = ego.getMargin();
     // If our lane is not the right line, we want to see
     // if we can get into the right lane

@@ -7,7 +7,7 @@
 #define TRAFFICJELLY_BASIC_ROAD_DYNAMICS_H
 
 
-#include "edge/basic_road/basic_road_observation.h"
+#include "basic_road_observation.h"
 #include "action.h"
 
 

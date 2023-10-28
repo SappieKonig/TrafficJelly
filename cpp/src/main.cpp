@@ -1,9 +1,9 @@
 #include <fstream>
 #include <iostream>
 
-#include "edge/basic_road/basic_road.h"
+#include "basic_road.h"
 #include "traffic_model.h"
-#include "node/node.h"
+#include "node.h"
 #include "car.h"
 
 int main()

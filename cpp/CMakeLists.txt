@@ -15,14 +15,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 set(SOURCES
         src/action.cpp
         src/action.cpp
-        src/node/node.cpp
-        src/node/basic_city.cpp
+        src/node.cpp
+        src/basic_city.cpp
         src/car.cpp
         src/traffic_model.cpp
-        src/edge/edge.cpp
-        src/edge/basic_road/basic_road.cpp
-        src/edge/basic_road/basic_road_dynamics.cpp
-        src/edge/basic_road/basic_road_observation.cpp
+        src/edge.cpp
+        src/basic_road.cpp
+        src/basic_road_dynamics.cpp
+        src/basic_road_observation.cpp
         src/route.cpp)
 
 # Link libraries

@@ -1,6 +1,3 @@
-//
-// Created by sappie on 11-10-23.
-//
 #include <random>
 
 #include "node/node.h"
@@ -9,13 +6,16 @@
 #define TRAFFICJELLY_BASIC_CITY_H
 
 
-class BasicCity : public Node {
+class BasicCity : public Node
+{
 private:
     int population;
     std::mt19937 rng;
+
 public:
     BasicCity(std::string label, int population, float x, float y);
     int getPopulation() { return population; }
+    void collectCars() override;
     void distributeCars() override;
     void spawnCar();
     void step(float dt) override {
@@ -26,6 +26,7 @@ public:
             spawnCar();
         }
     }
+    std::string toString() const override;
 };
 
 

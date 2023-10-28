@@ -14,6 +14,7 @@
 #include "node/node.h"
 #include "edge/edge.h"
 #include "visualizer.h"
+#include "route.h"
 
 class TrafficModelBuilder;
 
@@ -26,10 +27,8 @@ class TrafficModelBuilder;
 class TrafficModel
 {
 private:
-// Holds all information of the model.
-    float delta_time;
+    // Holds all information of the model.
     std::vector<std::shared_ptr<Node>> nodes;
-
     std::vector<Route> routes;
     // Convenient utility for users
     std::unordered_map<std::string, std::shared_ptr<Node>> labelToNode;
@@ -37,12 +36,16 @@ private:
 
     std::shared_ptr<Visualizer> visualizer; // The visualiser is shared pointer and not unique to enable downcasts. We currently only use basic visualization.
     std::vector<std::shared_ptr<Edge>> edges;
+
+    TrafficModel();
+
 public:
     TrafficModel(std::string fn, float delta_time);
     // Model usage and interpretation
-    void step();
+    void step(float dt);
     void transferCars();
     void display() const; // Only reasonably used, if small graph
+    void showRoutes() const;
     // getFirstEdge
     Edge& getEdge(int idx) {
         return *edges[idx];
@@ -72,35 +75,6 @@ public:
 };
 
 /*
- * This string command abstract base class represents commands that are called during the string directed build process.
- */
-class StringCommand
-{
-protected:
-    TrafficModelBuilder &trafficModelBuilder;
-
-public:
-    StringCommand(TrafficModelBuilder &trafficModelBuilder);
-    virtual void apply(std::vector<std::string>& args) const = 0;
-};
-
-class BasicRoadStringCommand : public StringCommand
-{
-public:
-    BasicRoadStringCommand(TrafficModelBuilder &trafficModelBuilder);
-    void apply(std::vector<std::string>& args) const override;
-};
-
-class BasicCityStringCommand : public StringCommand
-{
-public:
-    BasicCityStringCommand(TrafficModelBuilder &trafficModelBuilder);
-    void apply(std::vector<std::string>& args) const override;
-};
-
-#endif
-
-/*
  * This traffic model builder allows for the traffic model to be constructed incrementally before usage.
  * This may be enhanced to capture more complicated traffic constructions.
  * After build the traffic model is empty, so the builder could be used more than once.
@@ -108,16 +82,134 @@ public:
 class TrafficModelBuilder
 {
 private:
-    TrafficModel &trafficModel;
-    std::string file_content;
-    std::unordered_map<std::string, std::unique_ptr<StringCommand>> commander;
+    TrafficModel trafficModel;
+    std::random_device device;
 
 public:
-    TrafficModelBuilder(TrafficModel& trafficModel);
-    void build(std::string file_content);
-    void addBasicCity(std::string label, int population, float x, float y);
-    void addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float speedLimit, int nLanes);
+    void addBasicCity(std::string label, int population);
+    void addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float length, float speedLimit, int nLanes);
+    void addRoute(std::vector<std::string> nodesAlongRoute, std::vector<std::string> edgesAlongRoute, std::vector<float> waitingTimesAlongRoute);
+    TrafficModel build();
+    void save(std::string fn) const;
+};
 
+class TrafficModelStringDirector;
+
+/*
+ * This string command abstract base class represents commands that are called during the string directed build process.
+ */
+class StringCommand
+{
+protected:
+    TrafficModelStringDirector& director;
+
+public:
+    StringCommand(TrafficModelStringDirector& director);
+    virtual void apply(std::vector<std::string>& args) const = 0;
+};
+
+/*
+ * This string command builds a basic city.
+ */
+class BasicCityStringCommand : public StringCommand
+{
+public:
+    BasicCityStringCommand(TrafficModelStringDirector& director);
+    void apply(std::vector<std::string>& args) const override;
+};
+
+/*
+ * This string command builds a basic road.
+ */
+class BasicRoadStringCommand : public StringCommand
+{
+public:
+    BasicRoadStringCommand(TrafficModelStringDirector& director);
+    void apply(std::vector<std::string>& args) const override;
+};
+
+/*
+ * This string command caches waiting times.
+ */
+class RouteTimesStringCommand : public StringCommand
+{
+public:
+    RouteTimesStringCommand(TrafficModelStringDirector& director);
+    void apply(std::vector<std::string>& args) const override;
+};
+
+/*
+ * This string command caches nodes.
+ */
+class RouteNodesStringCommand : public StringCommand
+{
+public:
+    RouteNodesStringCommand(TrafficModelStringDirector& director);
+    void apply(std::vector<std::string>& args) const override;
+};
+
+/*
+ * This traffic model builder allows for the traffic model to be constructed incrementally before usage.
+ * This may be enhanced to capture more complicated traffic constructions.
+ * After build the traffic model is empty, so the builder could be used more than once.
+ */
+class RouteEdgesStringCommand : public StringCommand
+{
+public:
+    RouteEdgesStringCommand(TrafficModelStringDirector& director);
+    void apply(std::vector<std::string>& args) const override;
+};
+
+/*
+ * This string command adds the final route.
+ */
+class RouteStringCommand : public StringCommand
+{
+public:
+    RouteStringCommand(TrafficModelStringDirector& director);
+    void apply(std::vector<std::string>& args) const override;
+};
+
+/*
+ * This traffic model string director allows for the traffic model to be constructed from a string.
+ */
+class TrafficModelStringDirector
+{
+private:
+    std::string file_content;
+    std::unordered_map<std::string, std::unique_ptr<StringCommand>> commander;
+    TrafficModelBuilder trafficModelBuilder;
+    std::vector<std::string> nodesAlongRoute;
+    std::vector<std::string> edgesAlongRoute;
+    std::vector<float> waitingTimesAlongRoute;
+
+public:
+    TrafficModelStringDirector(std::string fn);
+    TrafficModel build();
+    void addBasicCity(std::vector<std::string>& args); // Not safe, if existent label. Also, probably should add argument object for more clarity of the parameters in code. Is getting tedious though.
+                                                       // TODO: Add x, y coordinates
+    void addBasicRoad(std::vector<std::string>& args);
+    void addNodesAlongRoute(std::vector<std::string> args);
+    void addEdgesAlongRoute(std::vector<std::string> args);
+    void addWaitingTimesAlongRoute(std::vector<std::string>& args);
+    void addRoute();
+
+    // Add string commands as friends, because I am too stupid to solve the encapsulation issues.
     friend BasicRoadStringCommand;
     friend BasicCityStringCommand;
 };
+
+/*
+ * This traffic model file director allows for the traffic model to be constructed from a text file.
+ */
+class TrafficModelFileDirector
+{
+private:
+    std::string fn;
+
+public:
+    TrafficModelFileDirector(std::string fn);
+    TrafficModel build();
+};
+
+#endif

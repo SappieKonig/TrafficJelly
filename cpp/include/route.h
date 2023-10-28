@@ -1,6 +1,7 @@
 #ifndef ROUTE_H
 #define ROUTE_H
 
+#include <memory>
 #include <random>
 #include <vector>
 #include "utils.h"
@@ -10,11 +11,11 @@
  */
 struct Checkpoint
 {
-    Node const& node;
-    Edge& edgeToNode; // THIS IS A VEEEEERY UGLY SNEAKY WORKAROUND FOR TRANSFERRING NODES. TODO: FIX.
+    std::shared_ptr<Node const> const node;
+    std::shared_ptr<Edge const> const edgeToNode;
     float const waitDurationBeforeEdge;
 
-    Checkpoint(Node const& node, Edge& edgeToNode, float const waitDurationBeforeEdge);
+    Checkpoint(std::shared_ptr<Node const> const node, std::shared_ptr<Edge const> const edgeToNode, float const waitDurationBeforeEdge);
 };
 
 /*
@@ -24,7 +25,7 @@ struct Checkpoint
 struct Route
 {
     std::vector<Checkpoint> checkpoints;
-    void show();
+    void show() const;
     std::string toString() const;
 };
 

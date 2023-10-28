@@ -1,17 +1,14 @@
-//
-// Created by sappie on 10-10-23.
-//
-
 #include "edge/basic_road/basic_road.h"
 
+#include <string>
 #include <utility>
 #include "edge/basic_road/basic_road_observation.h"
 #include "car.h"
 #include "algorithm"
 #include "node/node.h"
 
-BasicRoad::BasicRoad(Node& inNode, Node& outNode, std::string label, float speedLimit, int nLanes)
-        : Edge(inNode, outNode, std::move(label), speedLimit),  nLanes(nLanes)
+BasicRoad::BasicRoad(Node& inNode, Node& outNode, std::string label, float length, float speedLimit, int nLanes)
+        : Edge(inNode, outNode, std::move(label), length, speedLimit),  nLanes(nLanes)
 {
 
 }
@@ -42,6 +39,11 @@ void BasicRoad::setActions()
         (*base_car)->updateAction(obs);
     }
 
+}
+
+std::string BasicRoad::toString() const
+{
+    return "BasicRoad:" + label + "," + inNode.getLabel() + "," + outNode.getLabel() + "," + std::to_string(length) + "," + std::to_string(speedLimit) + "," + std::to_string(nLanes);
 }
 
 void BasicRoad::enterCar(std::unique_ptr<Car>&& car)

@@ -20,15 +20,15 @@ TrafficModel::TrafficModel(std::shared_ptr<std::random_device> device)
     routes->reserve(1);
 }
 
-void TrafficModel::step()
+void TrafficModel::step(float dt)
 {
     for (auto& edge : edges)
     {
-        edge->step(delta_time);
+        edge->step(dt);
     }
     for (auto& node : nodes)
     {
-        node->step(delta_time);
+        node->step(dt);
     }
     transferCars();
 }
@@ -108,7 +108,7 @@ TrafficModelBuilder::TrafficModelBuilder(std::shared_ptr<std::random_device> dev
 }
 
 void TrafficModelBuilder::addBasicCity(std::string label, int population, float x, float y) {
-    std::shared_ptr<Node> node = std::make_shared<BasicCity>(label, population, x, y trafficModel.routes, device);
+    std::shared_ptr<Node> node = std::make_shared<BasicCity>(label, population, x, y, trafficModel.routes, device);
     trafficModel.nodes.emplace_back(node);
     trafficModel.labelToNode[label] = node;
 }
@@ -280,7 +280,7 @@ void TrafficModelBuilder::save(std::string fn) const
 
 void TrafficModelStringDirector::addBasicCity(std::vector<std::string> &args)
 {
-    trafficModelBuilder.addBasicCity(args[0], std::stoi(args[1]));
+    trafficModelBuilder.addBasicCity(args[0], std::stoi(args[1]), std::stof(args[2]), std::stof(args[3]));
 }
 
 void TrafficModelStringDirector::addBasicRoad(std::vector<std::string>& args)

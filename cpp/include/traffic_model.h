@@ -90,7 +90,7 @@ private:
 
 public:
     TrafficModelBuilder(std::shared_ptr<std::random_device> device);
-    void addBasicCity(std::string label, int population);
+    void addBasicCity(std::string label, int population, float x, float y);
     void addBasicRoad(std::string label, std::string inNodeLabel, std::string outNodeLabel, float length, float speedLimit, int nLanes);
     void addRoute(std::vector<std::string> nodesAlongRoute, std::vector<std::string> edgesAlongRoute, std::vector<float> waitingTimesAlongRoute);
     TrafficModel build();

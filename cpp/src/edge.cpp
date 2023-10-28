@@ -3,12 +3,11 @@
 
 #include <iostream>
 
-Edge::Edge(Node& inNode, Node& outNode, std::string label, float speedLimit)
-    : inNode(inNode), outNode(outNode), label(std::move(label)), speedLimit(speedLimit)
+Edge::Edge(Node& inNode, Node& outNode, std::string label, float length, float speedLimit)
+    : inNode(inNode), outNode(outNode), label(std::move(label)), speedLimit(speedLimit), length(length)
 {
     inNode.outEdges.emplace_back(*this);
     outNode.inEdges.emplace_back(*this);
-    length = inNode.distanceTo(outNode);
     id = -1;
 }
 

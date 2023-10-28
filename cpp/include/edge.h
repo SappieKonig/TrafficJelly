@@ -32,10 +32,11 @@ protected:
     std::string const label;
 
 public:
-    Edge(Node& inNode, Node& outNode, std::string label, float speedLimit);
+    Edge(Node& inNode, Node& outNode, std::string label, float length, float speedLimit);
     virtual ~Edge();
     virtual void setActions() = 0;
     virtual void enterCar(std::unique_ptr<Car>&& car) = 0;
+    virtual std::string toString() const = 0;
     std::vector<std::unique_ptr<Car>> getExitingCars();
     void sortCars();
     void updateCars(float dt);

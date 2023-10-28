@@ -6,7 +6,6 @@
 
 #include "utils.h"
 
-
 /*
  * This is an action abstract base class for cars to take.
  * Actions are applied to cars and may affect internal parameters.

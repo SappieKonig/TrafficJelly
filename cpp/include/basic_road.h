@@ -12,9 +12,10 @@
 class BasicRoad : public Edge
 {
 public:
-    BasicRoad(Node& inNode, Node& outNode, std::string label, float speedLimit, int nLanes);
+    BasicRoad(Node& inNode, Node& outNode, std::string label, float length, float speedLimit, int nLanes);
     void enterCar(std::unique_ptr<Car>&& car) override;
     void setActions() override;
+    std::string toString() const override;
     int nLanes;
 };
 

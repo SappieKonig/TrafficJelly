@@ -10,11 +10,14 @@
 #include <iostream>
 #include <memory>
 #include <utility>
+#include <random>
 #include <vector>
 
-TrafficModel::TrafficModel()
+TrafficModel::TrafficModel(std::shared_ptr<std::random_device> device)
+    : device(device)
 {
     setIDs();
+    routes->reserve(1);
 }
 
 void TrafficModel::step()
@@ -87,14 +90,25 @@ void TrafficModel::display() const
 
 void TrafficModel::showRoutes() const
 {
-    for (Route const& route : routes)
+    for (Route const& route : *routes)
     {
         route.show();
     }
 }
 
+void TrafficModel::spawnCar(std::string label)
+{
+    std::dynamic_pointer_cast<BasicCity>(labelToNode[label])->spawnCar();
+}
+
+TrafficModelBuilder::TrafficModelBuilder(std::shared_ptr<std::random_device> device)
+    : trafficModel(device), device(device)
+{
+
+}
+
 void TrafficModelBuilder::addBasicCity(std::string label, int population, float x, float y) {
-    std::shared_ptr<Node> node = std::make_shared<BasicCity>(label, population, x, y);
+    std::shared_ptr<Node> node = std::make_shared<BasicCity>(label, population, x, y trafficModel.routes, device);
     trafficModel.nodes.emplace_back(node);
     trafficModel.labelToNode[label] = node;
 }
@@ -117,7 +131,7 @@ void TrafficModelBuilder::addRoute(std::vector<std::string> nodesAlongRoute, std
         Checkpoint checkpoint(trafficModel.labelToNode[nodesAlongRoute[i]], trafficModel.labelToEdge[edgesAlongRoute[i]], waitingTimesAlongRoute[i]);
         route.checkpoints.push_back(checkpoint);
     }
-    trafficModel.routes.push_back(route);
+    trafficModel.routes->push_back(route);
 }
 
 StringCommand::StringCommand(TrafficModelStringDirector& director)
@@ -192,8 +206,8 @@ void RouteStringCommand::apply(std::vector<std::string>& args) const
     director.addRoute();
 }
 
-TrafficModelStringDirector::TrafficModelStringDirector(std::string str)
-    : str(str)
+TrafficModelStringDirector::TrafficModelStringDirector(std::shared_ptr<std::random_device> device, std::string file_content)
+    : trafficModelBuilder(device), file_content(file_content)
 {
     commander.emplace("BasicRoad", std::unique_ptr<StringCommand>(new BasicRoadStringCommand(*this)));
     commander.emplace("BasicCity", std::unique_ptr<StringCommand>(new BasicCityStringCommand(*this)));
@@ -240,7 +254,9 @@ TrafficModel TrafficModelStringDirector::build()
 
 TrafficModel TrafficModelBuilder::build()
 {
-    return std::move(trafficModel);
+    TrafficModel ret = std::move(trafficModel);
+    trafficModel.device = device;
+    return ret;
 }
 
 void TrafficModelBuilder::save(std::string fn) const
@@ -254,7 +270,7 @@ void TrafficModelBuilder::save(std::string fn) const
     {
         str += edge->toString() + "\n";
     }
-    for (auto const& route : trafficModel.routes)
+    for (auto const& route : *trafficModel.routes)
     {
         str += route.toString() + "\n";
     }
@@ -296,8 +312,8 @@ void TrafficModelStringDirector::addRoute()
     trafficModelBuilder.addRoute(nodesAlongRoute, edgesAlongRoute, waitingTimesAlongRoute);
 }
 
-TrafficModelFileDirector::TrafficModelFileDirector(std::string fn)
-    : fn(fn)
+TrafficModelFileDirector::TrafficModelFileDirector(std::shared_ptr<std::random_device> device, std::string fn)
+    : device(device), fn(fn)
 {
 
 }
@@ -306,7 +322,7 @@ TrafficModel TrafficModelFileDirector::build()
 {
     std::ifstream file(fn);
     std::string str(std::istreambuf_iterator<char>{file}, {});
-    return TrafficModelStringDirector(str).build();
+    return TrafficModelStringDirector(device, str).build();
 }
 
 PYBIND11_MODULE(traffic_model, m) {

@@ -7,7 +7,7 @@ BasicRoad:A4-1,Delft,Amsterdam,70.000000,100.000000,4
 BasicRoad:A4-2,Amsterdam,Delft,70.000000,100.000000,4
 BasicRoad:A12-1,Utrecht,Delft,70.000000,100.000000,4
 BasicRoad:A12-2,Delft,Utrecht,70.000000,100.000000,4
-RouteTimes:1.000000,0.000000
-RouteNodes:Utrecht,Amsterdam
-RouteEdges:A2-2,A4-1
+RouteTimes:0.000000,1.000000
+RouteNodes:Amsterdam,Utrecht
+RouteEdges:A4-1,A2-2
 Route:

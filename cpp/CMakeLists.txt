@@ -23,7 +23,9 @@ set(SOURCES
         src/basic_road.cpp
         src/basic_road_dynamics.cpp
         src/basic_road_observation.cpp
-        src/route.cpp)
+        src/route.cpp
+        src/route_planner.cpp
+        src/car_parameters.cpp)
 
 # Link libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE pybind11::module)

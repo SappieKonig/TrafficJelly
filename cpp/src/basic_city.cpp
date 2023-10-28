@@ -1,13 +1,16 @@
 #include "basic_city.h"
 #include <string>
-
 #include <utility>
 
-BasicCity::BasicCity(std::string label, int population, float x, float y)
-    : Node(std::move(label), x, y), population(population)
+BasicCity::BasicCity(std::string label, int population, float x, float y, std::shared_ptr<std::vector<Route>> routes, std::shared_ptr<std::random_device> device)
+    : Node(std::move(label), x, y), population(population), carFactory(routes, device)
 {
-    std::random_device rd;
-    rng = std::mt19937(rd());
+
+}
+
+void BasicCity::spawnCar()
+{
+    storedCars.push_back(carFactory.createCar());
 }
 
 void BasicCity::collectCars()
@@ -23,18 +26,18 @@ void BasicCity::distributeCars()
 {
     for (auto& car : storedCars)
     {
-        // Choose a random edge to put the car on
-        std::uniform_int_distribution<> dis(0, outEdges.size() - 1);
-        int index = dis(rng);
-        outEdges[index].get().enterCar(std::move(car));
+        // Choose a random edge to put the car on (this should work via the route planner --> TODO: implement RandomRoutePlanner)
+        //std::uniform_int_distribution<> dis(0, outEdges.size() - 1);
+        //int index = dis(rng);
+        //outEdges[index].get().enterCar(std::move(car));
+        if (!car->hasTerminated())
+        {
+            car->nextCheckpoint();
+            std::unique_ptr<Checkpoint>& checkpoint = car->getTargetCheckpoint(); // Must be seperate for implementing waiting time
+            checkpoint->edgeToNode->enterCar(std::move(car)); // TODO: Implement waiting time, and yes, we will need a list rather than a vector.
+        }
     }
     storedCars.clear();
-}
-
-void BasicCity::spawnCar() {
-    std::unique_ptr<Car> car = std::make_unique<Car>();
-    // Put the car on the storedCars list
-    storedCars.push_back(std::move(car));
 }
 
 std::string BasicCity::toString() const

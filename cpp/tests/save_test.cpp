@@ -2,11 +2,13 @@
 
 #include "traffic_model.h"
 #include <iostream>
+#include <random>
 
 int main()
 {
     float dt = 0.1f;
-    TrafficModelBuilder trafficModelBuilder;
+    std::shared_ptr<std::random_device> device = std::make_shared<std::random_device>();
+    TrafficModelBuilder trafficModelBuilder(device);
     trafficModelBuilder.addBasicCity("Amsterdam", 900000);
     trafficModelBuilder.addBasicCity("Utrecht", 360000);
     trafficModelBuilder.addBasicCity("Delft", 100000);

@@ -7,16 +7,25 @@ RoutePlanner::~RoutePlanner()
 }
 
 BasicRoutePlanner::BasicRoutePlanner(Route& route)
-    : route(route)
+    : route(route), targetCheckpoint(std::make_unique<Checkpoint>(route.checkpoints[0]))
 {
 
 }
 
-std::shared_ptr<Checkpoint> BasicRoutePlanner::nextCheckpoint()
+bool BasicRoutePlanner::hasTerminated() const
 {
-    std::shared_ptr<Checkpoint> nextCheckpoint = checkpointIndex < route.checkpoints.size() ? std::make_unique<Checkpoint>(route.checkpoints[checkpointIndex]) : nullptr;
+    return checkpointIndex == route.checkpoints.size();
+}
+
+void BasicRoutePlanner::nextCheckpoint()
+{
+    targetCheckpoint = checkpointIndex < route.checkpoints.size() ? std::make_unique<Checkpoint>(route.checkpoints[checkpointIndex]) : nullptr;
     checkpointIndex++;
-    return nextCheckpoint;
+}
+
+std::unique_ptr<Checkpoint>& BasicRoutePlanner::getTargetCheckpoint()
+{
+    return targetCheckpoint;
 }
 
 void BasicRoutePlanner::showRoute()

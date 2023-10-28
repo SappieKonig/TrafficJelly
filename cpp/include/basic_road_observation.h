@@ -1,10 +1,3 @@
-//
-// Created by sappie on 10-10-23.
-//
-// Observation for a simple road. In a certain range around the car
-// (n meters, implemented in BasicRoad itself) the cars are observed.
-// That is, speed, position. (to possibly be extended with braking, etc.)
-
 #ifndef TRAFFICJELLY_OBSERVATION_H
 #define TRAFFICJELLY_OBSERVATION_H
 
@@ -14,13 +7,17 @@
 
 class Car;
 
-class RelativeCarObservation{
+class RelativeCarObservation
+{
 public:
     float dx, dv;
 };
 
-
-class Observation {
+// Observation for a simple road. In a certain range around the car
+// (n meters, implemented in BasicRoad itself) the cars are observed.
+// That is, speed, position. (to possibly be extended with braking, etc.)
+class Observation
+{
 public:
     Observation(std::vector<std::reference_wrapper<Car>> const& cars,
                 std::unique_ptr<Car> const& ego,
@@ -35,5 +32,4 @@ public:
     std::optional<RelativeCarObservation> back = std::nullopt;
 };
 
-
-#endif //TRAFFICJELLY_OBSERVATION_H
+#endif

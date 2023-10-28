@@ -1,62 +1,72 @@
+#include <vector>
+#include <queue>
 #include "route.h"
-#include "edge/edge.h"
 #include "node/node.h"
+#include "edge/edge.h"
 
-Checkpoint::Checkpoint(Node const& node, Edge& edgeToNode, float waitDurationBeforeEdge) // Part of the very sneaky workaround
-    : node(node), edgeToNode(edgeToNode), waitDurationBeforeEdge(waitDurationBeforeEdge)
-{
-
-}
-
-void Route::show() // Those dashes are kind of ugly
-{
-    for (Checkpoint& checkpoint : checkpoints)
-    {
-        std::cout << "-Road " << checkpoint.edgeToNode.getLabel() << "\n";
-        std::cout << "-City " << checkpoint.node.getLabel() << "\n";
+// This is a custom comparator for the priority queue
+struct ComparePair {
+    bool operator()(const std::pair<float, int>& p1, const std::pair<float, int>& p2) {
+        return p1.first > p2.first;
     }
-}
+};
 
-std::string Route::toString() const
-{
-    std::string times;
-    std::string nodes;
-    std::string edges;
-    for (int i = 0; i < checkpoints.size() - 1; i++)
-    {
-        times += "," + std::to_string(checkpoints[i].waitDurationBeforeEdge);
-        nodes += "," + checkpoints[i].node.getLabel();
-        edges += "," + checkpoints[i].edgeToNode.getLabel();
+std::vector<std::vector<int>> computeMapping(std::vector<std::shared_ptr<Node>>& nodes) {
+    int n = nodes.size();
+    std::vector<std::vector<int>> arr(n, std::vector<int>(n, -1));
+
+    for (auto startNode : nodes) {
+        std::priority_queue<std::pair<float, int>, std::vector<std::pair<float, int>>, ComparePair> pq;
+        std::vector<float> dist(n, std::numeric_limits<float>::infinity());
+        std::vector<int> prev(n, -1);
+
+        pq.emplace(0.0f, startNode->id);
+        dist[startNode->id] = 0.0f;
+
+        while (!pq.empty()) {
+            auto [currDist, currNodeID] = pq.top();
+            pq.pop();
+
+            auto currNode = nodes[currNodeID];
+
+            for (Edge& edgeRef : currNode->outEdges) {
+                Edge& edge = edgeRef;
+                float alt = currDist + edge.getExpectedCrossingTime();
+                int nextNodeID = edge.outNode.id;
+
+                if (alt < dist[nextNodeID]) {
+                    dist[nextNodeID] = alt;
+                    prev[nextNodeID] = currNodeID;
+                    pq.push({alt, nextNodeID});
+
+                    // Update the arr with this node as the "stepping stone" to nextNode
+                    int temp = nextNodeID;
+                    while (prev[temp] != startNode->id) {
+                        temp = prev[temp];
+                    }
+                    arr[nextNodeID][startNode->id] = temp;
+                }
+            }
+        }
     }
 
-    std::string str;
-    str += "RouteTimes:" + std::to_string(checkpoints[0].waitDurationBeforeEdge) + times + "\n";
-    str += "RouteNodes:" + checkpoints[0].node.getLabel() + nodes + "\n";
-    str += "RouteEdges:" + checkpoints[0].edgeToNode.getLabel() + edges + "\n";
-    str += "Route:";
-    return str;
+    return arr;
 }
 
-RouteSampler::RouteSampler(std::vector<Route>& routes, std::random_device& device)
-    : routes(routes), generator(device())
-{
 
-}
-
-Route& RouteSampler::select()
-{
-    std::uniform_int_distribution<int> dist(0, routes.size()-1);
-    int routeIndex = dist(generator);
-    return routes[routeIndex];
-}
-
-void RouteSampler::showRoutes()
-{
-    std::cout << routes.size() << "\n";
-    for (int i = 0; i < routes.size(); i++)
-    {
-        std::cout << "Route " << i+1 << ":\n";
-        routes[i].show();
+std::vector<int> reconstructPath(const std::vector<std::vector<int>>& arr, int startNodeId, int endNodeId) {
+    std::vector<int> path;
+    if (arr[endNodeId][startNodeId] == -1) {
+        // No path exists from startNodeId to endNodeId.
+        return path;
     }
+
+    path.push_back(startNodeId);
+    while (startNodeId != endNodeId) {
+        startNodeId = arr[endNodeId][startNodeId];
+        path.push_back(startNodeId);
+    }
+
+    return path;
 }
 

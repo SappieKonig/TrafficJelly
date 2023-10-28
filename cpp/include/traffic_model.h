@@ -13,7 +13,7 @@
 #include "car.h"
 #include "node/node.h"
 #include "edge/edge.h"
-#include "visualizer.h"
+#include "route.h"
 
 class TrafficModelBuilder;
 
@@ -27,15 +27,13 @@ class TrafficModel
 {
 private:
 // Holds all information of the model.
+    std::vector<std::vector<int>> shortestPathMapping;
     float delta_time;
     std::vector<std::shared_ptr<Node>> nodes;
-
-    std::vector<Route> routes;
     // Convenient utility for users
     std::unordered_map<std::string, std::shared_ptr<Node>> labelToNode;
     std::unordered_map<std::string, std::shared_ptr<Edge>> labelToEdge;
 
-    std::shared_ptr<Visualizer> visualizer; // The visualiser is shared pointer and not unique to enable downcasts. We currently only use basic visualization.
     std::vector<std::shared_ptr<Edge>> edges;
 public:
     TrafficModel(std::string fn, float delta_time);
@@ -68,6 +66,9 @@ public:
     }
     int getCarCountInNode(int idx) {
         return nodes[idx]->getNCars();
+    }
+    std::vector<int> getFastestPath(int startNodeID, int endNodeID) {
+        return reconstructPath(shortestPathMapping, startNodeID, endNodeID);
     }
 };
 

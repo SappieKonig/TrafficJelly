@@ -9,8 +9,6 @@
 #include <iostream>
 #include <tuple>
 #include "utils.h"
-//#include "observation.h"
-#include "visualizer.h"
 #include "car.h"
 
 /*
@@ -28,10 +26,10 @@ protected:
     int id;
 
     Node& inNode;
-    Node& outNode;
     std::string const label;
-
 public:
+
+    Node& outNode;
     Edge(Node& inNode, Node& outNode, std::string label, float speedLimit);
     virtual ~Edge();
     virtual void setActions() = 0;
@@ -52,6 +50,7 @@ public:
     Node& getInNode() const { return inNode; }
     Node& getOutNode() const { return outNode; }
     std::tuple<std::vector<int>, std::vector<float>> getCarCountHist(float bin_distance) const;
+    float getExpectedCrossingTime() const { return length / speedLimit; }
 };
 
 

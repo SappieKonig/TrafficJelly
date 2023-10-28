@@ -11,7 +11,6 @@
 #include "utils.h"
 #include "car.h"
 #include "edge/edge.h"
-#include "visualizer.h"
 #include <tuple>
 /*
  * This is a node for the internal graph of TrafficModel.
@@ -22,10 +21,10 @@
 
 class Node {
     std::string const label;
-    int id;
     float x, y;
-
 public:
+
+    int id;
     Node(std::string label, float x, float y);
     std::string getLabel() { return label; }
     std::vector<std::reference_wrapper<Edge>> inEdges; // ref

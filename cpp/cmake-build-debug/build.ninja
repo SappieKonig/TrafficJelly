@@ -57,22 +57,6 @@ build CMakeFiles/traffic_model.dir/src/action.cpp.o: CXX_COMPILER__traffic_model
   OBJECT_DIR = CMakeFiles/traffic_model.dir
   OBJECT_FILE_DIR = CMakeFiles/traffic_model.dir/src
 
-build CMakeFiles/traffic_model.dir/src/node/node.cpp.o: CXX_COMPILER__traffic_model_Debug /Users/ignacekonig/Development/TrafficJelly/cpp/src/node/node.cpp || cmake_object_order_depends_target_traffic_model
-  DEFINES = -Dtraffic_model_EXPORTS
-  DEP_FILE = CMakeFiles/traffic_model.dir/src/node/node.cpp.o.d
-  FLAGS = -O3 -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk -mmacosx-version-min=13.6 -fPIC -fcolor-diagnostics -std=gnu++17
-  INCLUDES = -I/Users/ignacekonig/Development/TrafficJelly/cpp/include -isystem /opt/homebrew/include -isystem /opt/homebrew/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/include/python3.11
-  OBJECT_DIR = CMakeFiles/traffic_model.dir
-  OBJECT_FILE_DIR = CMakeFiles/traffic_model.dir/src/node
-
-build CMakeFiles/traffic_model.dir/src/node/basic_city.cpp.o: CXX_COMPILER__traffic_model_Debug /Users/ignacekonig/Development/TrafficJelly/cpp/src/node/basic_city.cpp || cmake_object_order_depends_target_traffic_model
-  DEFINES = -Dtraffic_model_EXPORTS
-  DEP_FILE = CMakeFiles/traffic_model.dir/src/node/basic_city.cpp.o.d
-  FLAGS = -O3 -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk -mmacosx-version-min=13.6 -fPIC -fcolor-diagnostics -std=gnu++17
-  INCLUDES = -I/Users/ignacekonig/Development/TrafficJelly/cpp/include -isystem /opt/homebrew/include -isystem /opt/homebrew/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/include/python3.11
-  OBJECT_DIR = CMakeFiles/traffic_model.dir
-  OBJECT_FILE_DIR = CMakeFiles/traffic_model.dir/src/node
-
 build CMakeFiles/traffic_model.dir/src/car.cpp.o: CXX_COMPILER__traffic_model_Debug /Users/ignacekonig/Development/TrafficJelly/cpp/src/car.cpp || cmake_object_order_depends_target_traffic_model
   DEFINES = -Dtraffic_model_EXPORTS
   DEP_FILE = CMakeFiles/traffic_model.dir/src/car.cpp.o.d
@@ -80,22 +64,6 @@ build CMakeFiles/traffic_model.dir/src/car.cpp.o: CXX_COMPILER__traffic_model_De
   INCLUDES = -I/Users/ignacekonig/Development/TrafficJelly/cpp/include -isystem /opt/homebrew/include -isystem /opt/homebrew/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/include/python3.11
   OBJECT_DIR = CMakeFiles/traffic_model.dir
   OBJECT_FILE_DIR = CMakeFiles/traffic_model.dir/src
-
-build CMakeFiles/traffic_model.dir/src/traffic_model.cpp.o: CXX_COMPILER__traffic_model_Debug /Users/ignacekonig/Development/TrafficJelly/cpp/src/traffic_model.cpp || cmake_object_order_depends_target_traffic_model
-  DEFINES = -Dtraffic_model_EXPORTS
-  DEP_FILE = CMakeFiles/traffic_model.dir/src/traffic_model.cpp.o.d
-  FLAGS = -O3 -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk -mmacosx-version-min=13.6 -fPIC -fcolor-diagnostics -std=gnu++17
-  INCLUDES = -I/Users/ignacekonig/Development/TrafficJelly/cpp/include -isystem /opt/homebrew/include -isystem /opt/homebrew/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/include/python3.11
-  OBJECT_DIR = CMakeFiles/traffic_model.dir
-  OBJECT_FILE_DIR = CMakeFiles/traffic_model.dir/src
-
-build CMakeFiles/traffic_model.dir/src/edge/edge.cpp.o: CXX_COMPILER__traffic_model_Debug /Users/ignacekonig/Development/TrafficJelly/cpp/src/edge/edge.cpp || cmake_object_order_depends_target_traffic_model
-  DEFINES = -Dtraffic_model_EXPORTS
-  DEP_FILE = CMakeFiles/traffic_model.dir/src/edge/edge.cpp.o.d
-  FLAGS = -O3 -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk -mmacosx-version-min=13.6 -fPIC -fcolor-diagnostics -std=gnu++17
-  INCLUDES = -I/Users/ignacekonig/Development/TrafficJelly/cpp/include -isystem /opt/homebrew/include -isystem /opt/homebrew/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/include/python3.11
-  OBJECT_DIR = CMakeFiles/traffic_model.dir
-  OBJECT_FILE_DIR = CMakeFiles/traffic_model.dir/src/edge
 
 build CMakeFiles/traffic_model.dir/src/edge/basic_road/basic_road.cpp.o: CXX_COMPILER__traffic_model_Debug /Users/ignacekonig/Development/TrafficJelly/cpp/src/edge/basic_road/basic_road.cpp || cmake_object_order_depends_target_traffic_model
   DEFINES = -Dtraffic_model_EXPORTS
@@ -121,6 +89,54 @@ build CMakeFiles/traffic_model.dir/src/edge/basic_road/basic_road_observation.cp
   OBJECT_DIR = CMakeFiles/traffic_model.dir
   OBJECT_FILE_DIR = CMakeFiles/traffic_model.dir/src/edge/basic_road
 
+build CMakeFiles/traffic_model.dir/src/edge/edge.cpp.o: CXX_COMPILER__traffic_model_Debug /Users/ignacekonig/Development/TrafficJelly/cpp/src/edge/edge.cpp || cmake_object_order_depends_target_traffic_model
+  DEFINES = -Dtraffic_model_EXPORTS
+  DEP_FILE = CMakeFiles/traffic_model.dir/src/edge/edge.cpp.o.d
+  FLAGS = -O3 -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk -mmacosx-version-min=13.6 -fPIC -fcolor-diagnostics -std=gnu++17
+  INCLUDES = -I/Users/ignacekonig/Development/TrafficJelly/cpp/include -isystem /opt/homebrew/include -isystem /opt/homebrew/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/include/python3.11
+  OBJECT_DIR = CMakeFiles/traffic_model.dir
+  OBJECT_FILE_DIR = CMakeFiles/traffic_model.dir/src/edge
+
+build CMakeFiles/traffic_model.dir/src/main.cpp.o: CXX_COMPILER__traffic_model_Debug /Users/ignacekonig/Development/TrafficJelly/cpp/src/main.cpp || cmake_object_order_depends_target_traffic_model
+  DEFINES = -Dtraffic_model_EXPORTS
+  DEP_FILE = CMakeFiles/traffic_model.dir/src/main.cpp.o.d
+  FLAGS = -O3 -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk -mmacosx-version-min=13.6 -fPIC -fcolor-diagnostics -std=gnu++17
+  INCLUDES = -I/Users/ignacekonig/Development/TrafficJelly/cpp/include -isystem /opt/homebrew/include -isystem /opt/homebrew/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/include/python3.11
+  OBJECT_DIR = CMakeFiles/traffic_model.dir
+  OBJECT_FILE_DIR = CMakeFiles/traffic_model.dir/src
+
+build CMakeFiles/traffic_model.dir/src/node/basic_city.cpp.o: CXX_COMPILER__traffic_model_Debug /Users/ignacekonig/Development/TrafficJelly/cpp/src/node/basic_city.cpp || cmake_object_order_depends_target_traffic_model
+  DEFINES = -Dtraffic_model_EXPORTS
+  DEP_FILE = CMakeFiles/traffic_model.dir/src/node/basic_city.cpp.o.d
+  FLAGS = -O3 -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk -mmacosx-version-min=13.6 -fPIC -fcolor-diagnostics -std=gnu++17
+  INCLUDES = -I/Users/ignacekonig/Development/TrafficJelly/cpp/include -isystem /opt/homebrew/include -isystem /opt/homebrew/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/include/python3.11
+  OBJECT_DIR = CMakeFiles/traffic_model.dir
+  OBJECT_FILE_DIR = CMakeFiles/traffic_model.dir/src/node
+
+build CMakeFiles/traffic_model.dir/src/node/node.cpp.o: CXX_COMPILER__traffic_model_Debug /Users/ignacekonig/Development/TrafficJelly/cpp/src/node/node.cpp || cmake_object_order_depends_target_traffic_model
+  DEFINES = -Dtraffic_model_EXPORTS
+  DEP_FILE = CMakeFiles/traffic_model.dir/src/node/node.cpp.o.d
+  FLAGS = -O3 -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk -mmacosx-version-min=13.6 -fPIC -fcolor-diagnostics -std=gnu++17
+  INCLUDES = -I/Users/ignacekonig/Development/TrafficJelly/cpp/include -isystem /opt/homebrew/include -isystem /opt/homebrew/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/include/python3.11
+  OBJECT_DIR = CMakeFiles/traffic_model.dir
+  OBJECT_FILE_DIR = CMakeFiles/traffic_model.dir/src/node
+
+build CMakeFiles/traffic_model.dir/src/route.cpp.o: CXX_COMPILER__traffic_model_Debug /Users/ignacekonig/Development/TrafficJelly/cpp/src/route.cpp || cmake_object_order_depends_target_traffic_model
+  DEFINES = -Dtraffic_model_EXPORTS
+  DEP_FILE = CMakeFiles/traffic_model.dir/src/route.cpp.o.d
+  FLAGS = -O3 -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk -mmacosx-version-min=13.6 -fPIC -fcolor-diagnostics -std=gnu++17
+  INCLUDES = -I/Users/ignacekonig/Development/TrafficJelly/cpp/include -isystem /opt/homebrew/include -isystem /opt/homebrew/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/include/python3.11
+  OBJECT_DIR = CMakeFiles/traffic_model.dir
+  OBJECT_FILE_DIR = CMakeFiles/traffic_model.dir/src
+
+build CMakeFiles/traffic_model.dir/src/traffic_model.cpp.o: CXX_COMPILER__traffic_model_Debug /Users/ignacekonig/Development/TrafficJelly/cpp/src/traffic_model.cpp || cmake_object_order_depends_target_traffic_model
+  DEFINES = -Dtraffic_model_EXPORTS
+  DEP_FILE = CMakeFiles/traffic_model.dir/src/traffic_model.cpp.o.d
+  FLAGS = -O3 -g -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk -mmacosx-version-min=13.6 -fPIC -fcolor-diagnostics -std=gnu++17
+  INCLUDES = -I/Users/ignacekonig/Development/TrafficJelly/cpp/include -isystem /opt/homebrew/include -isystem /opt/homebrew/opt/python@3.11/Frameworks/Python.framework/Versions/3.11/include/python3.11
+  OBJECT_DIR = CMakeFiles/traffic_model.dir
+  OBJECT_FILE_DIR = CMakeFiles/traffic_model.dir/src
+
 
 # =============================================================================
 # Link build statements for MODULE_LIBRARY target traffic_model
@@ -129,7 +145,7 @@ build CMakeFiles/traffic_model.dir/src/edge/basic_road/basic_road_observation.cp
 #############################################
 # Link the shared module traffic_model.so
 
-build traffic_model.so: CXX_MODULE_LIBRARY_LINKER__traffic_model_Debug CMakeFiles/traffic_model.dir/src/action.cpp.o CMakeFiles/traffic_model.dir/src/node/node.cpp.o CMakeFiles/traffic_model.dir/src/node/basic_city.cpp.o CMakeFiles/traffic_model.dir/src/car.cpp.o CMakeFiles/traffic_model.dir/src/traffic_model.cpp.o CMakeFiles/traffic_model.dir/src/edge/edge.cpp.o CMakeFiles/traffic_model.dir/src/edge/basic_road/basic_road.cpp.o CMakeFiles/traffic_model.dir/src/edge/basic_road/basic_road_dynamics.cpp.o CMakeFiles/traffic_model.dir/src/edge/basic_road/basic_road_observation.cpp.o
+build traffic_model.so: CXX_MODULE_LIBRARY_LINKER__traffic_model_Debug CMakeFiles/traffic_model.dir/src/action.cpp.o CMakeFiles/traffic_model.dir/src/car.cpp.o CMakeFiles/traffic_model.dir/src/edge/basic_road/basic_road.cpp.o CMakeFiles/traffic_model.dir/src/edge/basic_road/basic_road_dynamics.cpp.o CMakeFiles/traffic_model.dir/src/edge/basic_road/basic_road_observation.cpp.o CMakeFiles/traffic_model.dir/src/edge/edge.cpp.o CMakeFiles/traffic_model.dir/src/main.cpp.o CMakeFiles/traffic_model.dir/src/node/basic_city.cpp.o CMakeFiles/traffic_model.dir/src/node/node.cpp.o CMakeFiles/traffic_model.dir/src/route.cpp.o CMakeFiles/traffic_model.dir/src/traffic_model.cpp.o
   ARCH_FLAGS = -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk -mmacosx-version-min=13.6
   LANGUAGE_COMPILE_FLAGS = -O3 -g
   LINK_FLAGS = -Xlinker -undefined -Xlinker dynamic_lookup

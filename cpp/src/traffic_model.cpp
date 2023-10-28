@@ -1,15 +1,13 @@
 #include "traffic_model.h"
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-//#include "visualizer.h"
-#include "car.h"
 #include "edge/basic_road/basic_road.h"
 #include "node/basic_city.h"
+#include "route.h"
 
-#include <algorithm>
+
 #include <iostream>
 #include <memory>
-#include <utility>
 #include <vector>
 
 TrafficModel::TrafficModel(std::string fn, float delta_time)
@@ -23,6 +21,7 @@ TrafficModel::TrafficModel(std::string fn, float delta_time)
     std::cout << "Nodes: " << nodes.size() << "\n";
     std::cout << "Edges: " << edges.size() << "\n";
     setIDs();
+    shortestPathMapping = computeMapping(nodes);
 }
 
 void TrafficModel::step()
@@ -181,6 +180,7 @@ PYBIND11_MODULE(traffic_model, m) {
         .def("get_edge_end_node_id", &TrafficModel::getEdgeEndNodeID)
         .def("get_node_pos", &TrafficModel::getNodePosition)
         .def("get_car_count_histogram_in_edge", &TrafficModel::getCarCountHistInEdge)
-        .def("get_car_count_in_node", &TrafficModel::getCarCountInNode);
+        .def("get_car_count_in_node", &TrafficModel::getCarCountInNode)
+        .def("get_fastest_path", &TrafficModel::getFastestPath);
 }
 

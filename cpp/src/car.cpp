@@ -1,10 +1,5 @@
 #include "car.h"
-//#include "route_planner.h"
-//#include <memory>
 #include <random>
-#include <iostream>
-//#include <vector>
-//#include "edge/edge.h"
 
 
 std::default_random_engine Car::generator(time(0));

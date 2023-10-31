@@ -5,7 +5,7 @@ from traffic_jelly.data_types import GraphicsCar
 from .simulation import Simulation
 
 
-@dataclass(kw_only=True)
+@dataclass
 class SimulationCar:
     id: int
 

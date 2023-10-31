@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional
 
 import pygame
 
@@ -18,7 +17,7 @@ CAR_LENGTH = 4.5  # m
 CAR_WIDTH = LANE_WIDTH  # m
 
 
-@dataclass(kw_only=True)
+@dataclass
 class GameState:
     """
     Attributes

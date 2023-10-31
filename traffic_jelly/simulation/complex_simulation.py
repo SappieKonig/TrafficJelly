@@ -14,7 +14,7 @@ class Car:
         self.lane = 0
         self.action = None
 
-        self.mode = "independent"
+        self.mode = "dependent"
 
     def step(self, time_step_size):
         self.age += time_step_size
@@ -54,7 +54,7 @@ class Car:
 
 
 class ComplexSimulation(Simulation):
-    def __init__(self, length, spawn_prob_per_sec=0.1):
+    def __init__(self, length, spawn_prob_per_sec=0.1, mode = "double"):
         self.length = length  # m
         self.vehicles: list[Car] = []
         self.time_taken = []
@@ -62,7 +62,7 @@ class ComplexSimulation(Simulation):
         self.spawn_prob = spawn_prob_per_sec * self.time_step_size
         self.lane_count = 2
 
-        self.mode = "double"
+        self.mode = mode
 
 
     def switch_lane(self):
@@ -191,17 +191,18 @@ class ComplexSimulation(Simulation):
         x = np.linspace(minutes_taken.min(), minutes_taken.max(), 1000)
         norm_dist = norm.pdf(x, mean, std) * hist_surface
         plt.plot(x, norm_dist, color="red")
-        plt.hist(minutes_taken, bins=n_bins)
+        plt.hist(minutes_taken, bins=n_bins, )
         plt.xlabel("Time taken (minutes)")
         plt.ylabel("Frequency")
-        plt.title("Histogram arrival times")
+        plt.title("mode = " + self.mode + ", p = " + str(round(self.spawn_prob, 1)))
+        plt.savefig("C:\\Users\\Miss Mes\\OneDrive - Delft University of Technology\\School\\vakken\\Y3\\Y3 Q1\\Modelling\\graphs\\" + "independent_mode_"+self.mode+"_p_"+str(self.spawn_prob)+".png")
         plt.show()
 
     def create_histogram_close(self, n_bins=30):
         minutes_taken = np.sort(np.array(self.time_taken) / 60)  # Convert to minutes
         L = len(minutes_taken)
         minutes_taken = minutes_taken[0: int(9 * L // 10)]
-        bin_width = (minutes_taken.max() - minutes_taken.min()) / n_bins
+        bin_width = (minutes_taken.max() - minutes_taken.min()) / n_bins # 4 because of low time step
         hist_surface = bin_width * len(minutes_taken)
         mean = minutes_taken.mean()
         std = minutes_taken.std()

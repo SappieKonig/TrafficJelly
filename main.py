@@ -2,10 +2,11 @@ from traffic_jelly.simulation import ComplexSimulation
 from traffic_jelly.camera import StationaryCamera
 from traffic_jelly.visualization import Game
 
+import numpy as np
 import time
 
 L = 5000
-p = 1
+p = 0.5
 
 
 def main():
@@ -24,10 +25,13 @@ def main():
     ).main()
 
 def graphs():
-    simulation = ComplexSimulation(length=L, spawn_prob_per_sec=p)
-    for _ in range(L * 1000):
-        simulation.step_forward()
-    simulation.create_histogram()
+    for p in [i * 0.1 for i in range(1, 11)]:
+        simulation = ComplexSimulation(length=L, spawn_prob_per_sec=p, mode = "single")
+        for _ in range(L * 100):
+            simulation.step_forward()
+            if _ == L * 50:
+                simulation.time_taken = []
+        simulation.create_histogram()
 
 if __name__ == '__main__':
     graphs()

@@ -54,6 +54,31 @@ std::vector<std::vector<int>> computeMapping(std::vector<std::shared_ptr<Node>>&
 }
 
 
+std::vector<std::vector<float>> computeProbabilities(std::vector<int> populations) {
+    int n = populations.size();
+    std::vector<std::vector<float>> arr(n, std::vector<float>(n, 0.0f));
+
+    float sum = 0;
+    for (int i = 0; i < n; ++i) {
+        arr[i][i] = 0.0f;
+        for (int j = i + 1; j < n; ++j) {
+            float p = (float) populations[i] * (float) populations[j];
+            arr[i][j] = p;
+            arr[j][i] = p;
+            sum += 2 * p;
+        }
+    }
+
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            arr[i][j] /= sum;
+        }
+    }
+
+    return arr;
+}
+
+
 std::vector<int> reconstructPath(const std::vector<std::vector<int>>& arr, int startNodeId, int endNodeId) {
     std::vector<int> path;
     if (arr[endNodeId][startNodeId] == -1) {

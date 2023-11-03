@@ -4,8 +4,8 @@
 #include <utility>
 #include <random>
 
-Node::Node(std::string label, float x, float y)
-    : label(std::move(label)), x(x), y(y)
+Node::Node(std::string label, float x, float y, int population)
+    : label(std::move(label)), x(x), y(y), population(population)
 {
     id = -1;
 }

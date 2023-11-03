@@ -36,13 +36,14 @@ private:
 
 public:
 //    Car(std::unique_ptr<RoutePlanner> routePlanner);
-    Car();
+    Car(std::vector<int> path);
     void syncCarToEdge(float targetSpeed) {
         baseTarget = targetSpeed;
         x = 0;
     }
     void updateAction(Observation const& observation);
     void step(float dt);
+    std::vector<int> path;
 
     float getX() const { return x; }
     float getV() const { return v; }

@@ -8,7 +8,7 @@
 #include <utility>
 
 BasicCity::BasicCity(std::string label, int population, float x, float y)
-    : Node(std::move(label), x, y), population(population)
+    : Node(std::move(label), x, y, population), population(population)
 {
     std::random_device rd;
     rng = std::mt19937(rd());
@@ -16,16 +16,20 @@ BasicCity::BasicCity(std::string label, int population, float x, float y)
 
 void BasicCity::distributeCars() {
     for (auto& car : storedCars) {
-        // Choose a random edge to put the car on
-        std::uniform_int_distribution<> dis(0, (int) outEdges.size() - 1);
-        int index = dis(rng);
-        outEdges[index].get().enterCar(std::move(car));
+        if (car->path[0] == id) {
+            // remove the first node from the path
+            car->path.erase(car->path.begin());
+        }
+        if (car->path.empty()) {
+            continue;
+        }
+        int nextNode = car->path[0];
+        for (auto& edge : outEdges) {
+            if (edge.get().getOutNode().getID() == nextNode) {
+                edge.get().enterCar(std::move(car));
+                break;
+            }
+        }
     }
     storedCars.clear();
-}
-
-void BasicCity::spawnCar() {
-    std::unique_ptr<Car> car = std::make_unique<Car>();
-    // Put the car on the storedCars list
-    storedCars.push_back(std::move(car));
 }

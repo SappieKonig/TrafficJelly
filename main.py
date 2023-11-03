@@ -3,9 +3,7 @@ from traffic_model import TrafficModel
 
 from graphviz.game import Game
 from graphviz.simulation import Simulation
-# noinspection PyUnresolvedReferences
 from graphviz.view.game_graph_view import GameGraphView
-# noinspection PyUnresolvedReferences
 from graphviz.view.game_road_view import GameRoadView
 
 

@@ -6,7 +6,8 @@ std::default_random_engine Car::generator(time(0));
 std::normal_distribution<double> Car::normalDistribution(30, 3);
 
 
-Car::Car()
+Car::Car(std::vector<int> path) :
+    path(std::move(path))
 {
     v = (float) normalDistribution(generator);
     offset = 0;

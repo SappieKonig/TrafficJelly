@@ -8,6 +8,7 @@
 #include <optional>
 #include <memory>
 #include <any>
+#include <random>
 
 #include "utils.h"
 #include "car.h"
@@ -33,11 +34,15 @@ private:
     // Convenient utility for users
     std::unordered_map<std::string, std::shared_ptr<Node>> labelToNode;
     std::unordered_map<std::string, std::shared_ptr<Edge>> labelToEdge;
-
+    int population;
     std::vector<std::shared_ptr<Edge>> edges;
 public:
+    std::default_random_engine generator;
+    std::uniform_real_distribution<float> distribution;
+    std::vector<std::vector<float>> mappingProbabilities;
     TrafficModel(std::string fn, float delta_time);
     // Model usage and interpretation
+    void spawnCar();
     void step();
     void transferCars();
     void display() const; // Only reasonably used, if small graph
@@ -70,6 +75,9 @@ public:
     std::vector<int> getFastestPath(int startNodeID, int endNodeID) {
         return reconstructPath(shortestPathMapping, startNodeID, endNodeID);
     }
+    float global_time;
+
+    void spawnCars();
 };
 
 /*

@@ -9,9 +9,10 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <chrono>
 
 TrafficModel::TrafficModel(std::string fn, float delta_time)
-    : delta_time(delta_time)
+    : delta_time(delta_time), population(0), global_time(0)
 {
     std::ifstream file(fn);
     std::string str(std::istreambuf_iterator<char>{file}, {});
@@ -22,6 +23,15 @@ TrafficModel::TrafficModel(std::string fn, float delta_time)
     std::cout << "Edges: " << edges.size() << "\n";
     setIDs();
     shortestPathMapping = computeMapping(nodes);
+    std::vector<int> populations;
+    populations.reserve(nodes.size());
+    for (auto& node : nodes) {
+        populations.push_back(node->population);
+    }
+    population = std::accumulate(populations.begin(), populations.end(), 0);
+    mappingProbabilities = computeProbabilities(populations);
+    generator = std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count());
+    distribution = std::uniform_real_distribution<float>(0.0f, 1.0f);
 }
 
 void TrafficModel::step()
@@ -34,7 +44,41 @@ void TrafficModel::step()
     {
         node->step(delta_time);
     }
+    spawnCars();
     transferCars();
+    global_time += delta_time;
+}
+
+void TrafficModel::spawnCar() {
+    float p = distribution(generator);
+    for (int i = 0; i < mappingProbabilities.size(); i++) {
+        for (int j = 0; j < mappingProbabilities[i].size(); j++) {
+            p -= mappingProbabilities[i][j];
+            if (p < 0) {
+                auto path = getFastestPath(i, j);
+                nodes[i]->spawnCar(path);
+                return;
+            }
+        }
+    }
+}
+
+
+void TrafficModel::spawnCars() {
+    // Calculate spawns
+    float spawn_prob = (float) population * 0.2f / 86400.0f * delta_time;
+//    if (global_time == 0) {
+//        spawn_prob = 1;
+//    } else {
+//        spawn_prob = 0;
+//    }
+    while (spawn_prob > 1) {
+        spawnCar();
+        spawn_prob -= 1;
+    }
+    if (distribution(generator) < spawn_prob) {
+        spawnCar();
+    }
 }
 
 void TrafficModel::setIDs() {

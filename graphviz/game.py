@@ -16,7 +16,7 @@ class Game:
 
         self.font = pygame.font.Font(None, 36)
 
-        self.screen = pygame.display.set_mode((1280, 720))
+        self.screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
         self.clock = pygame.time.Clock()
         self.display = pygame.display
         self.simulation = simulation

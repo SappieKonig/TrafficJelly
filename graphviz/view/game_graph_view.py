@@ -66,7 +66,6 @@ class GameGraphView(GameView):
 
     def __init__(self, game: 'Game'):
         self.game = game
-        self.screen = pygame.display.set_mode((1280, 720))
         self.screen = game.screen
         self.simulation = game.simulation
 

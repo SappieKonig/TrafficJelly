@@ -55,8 +55,8 @@ class Game:
             self.render()
 
             self.display.flip()
-            self.dt = self.clock.tick(self.FPS) / 1000 * self.state.time_factor_pause
-            self.state.alpha += self.dt * self.state.time_scale / self.state.delta_time
+            self.dt = self.clock.tick(self.FPS) / 1000
+            self.state.alpha += self.dt * self.state.time_scale / self.state.delta_time * self.state.time_factor_pause
 
     def on_event(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:

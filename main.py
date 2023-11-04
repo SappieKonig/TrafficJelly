@@ -29,7 +29,7 @@ def main():
     simulation = TrafficModel("graph.txt", DELTA_TIME, SCALE)
     start = time.time()
     steps_per_day = int(3600 * 24 / DELTA_TIME * SCALE)
-    until = int(9 / 24 * steps_per_day)
+    until = int(12 / 24 * steps_per_day)
     for i in range(until):
         if i % 100 == 0:
             cars_per_edge.append(simulation.get_n_cars_per_edge())
@@ -41,9 +41,13 @@ def main():
             print(i / steps_per_day * 24)
         simulation.step_forward()
     # simulation = create_simulation()
-    # arrival_stats = simulation.get_travel_stats()
-    # filtered_arrival_stats = [arrival_stat for arrival_stat in arrival_stats if arrival_stat[0] == 0 and arrival_stat[1] == 1]
-    # plot_arrival_stats_hist(arrival_stats, 0, 1)
+    arrival_stats = simulation.get_travel_stats()
+    # save arrival stats to file
+    with open("arrival_stats.txt", "w") as f:
+        for arrival_stat in arrival_stats:
+            f.write(f"{arrival_stat[0]} {arrival_stat[1]} {arrival_stat[2]} {arrival_stat[3]}\n")
+    filtered_arrival_stats = [arrival_stat for arrival_stat in arrival_stats if arrival_stat[0] == 0 and arrival_stat[1] == 1]
+    plot_arrival_stats_hist(arrival_stats, 0, 1)
     game = Game(simulation=simulation)
     game.push_view(GameGraphView(game=game))
     game.main()

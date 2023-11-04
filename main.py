@@ -1,4 +1,6 @@
-from __future__ import annotations
+import os
+os.system("./build.sh")
+
 from traffic_model import TrafficModel
 import time
 import matplotlib.pyplot as plt
@@ -10,7 +12,7 @@ from graphviz.view.game_road_view import GameRoadView
 
 
 DELTA_TIME = 0.2
-SCALE = 1/6
+SCALE = 1
 
 # fromNode, toNode, timeTaken, startTime
 ArrivalStats = tuple[int, int, float, float]
@@ -26,8 +28,9 @@ def main():
     cars_per_edge = []
     simulation = TrafficModel("graph.txt", DELTA_TIME, SCALE)
     start = time.time()
-    steps_per_day = int(3600 * 17 / DELTA_TIME * SCALE)
-    for i in range(steps_per_day):
+    steps_per_day = int(3600 * 24 / DELTA_TIME * SCALE)
+    until = int(9 / 24 * steps_per_day)
+    for i in range(until):
         if i % 100 == 0:
             cars_per_edge.append(simulation.get_n_cars_per_edge())
             time_taken = time.time() - start
@@ -35,15 +38,15 @@ def main():
             start = time.time()
             n_cars = simulation.get_n_cars_in_simulation()
             print(f"Number of cars in simulation: {n_cars}")
-            print(i)
+            print(i / steps_per_day * 24)
         simulation.step_forward()
     # simulation = create_simulation()
-    arrival_stats = simulation.get_travel_stats()
-    filtered_arrival_stats = [arrival_stat for arrival_stat in arrival_stats if arrival_stat[0] == 0 and arrival_stat[1] == 1]
-    plot_arrival_stats_hist(arrival_stats, 0, 1)
-    # game = Game(simulation=simulation)
-    # game.push_view(GameGraphView(game=game))
-    # game.main()
+    # arrival_stats = simulation.get_travel_stats()
+    # filtered_arrival_stats = [arrival_stat for arrival_stat in arrival_stats if arrival_stat[0] == 0 and arrival_stat[1] == 1]
+    # plot_arrival_stats_hist(arrival_stats, 0, 1)
+    game = Game(simulation=simulation)
+    game.push_view(GameGraphView(game=game))
+    game.main()
 
 
 def create_simulation():

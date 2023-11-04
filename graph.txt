@@ -1,141 +1,65 @@
-BasicCity:Amsterdam,917923,0.00,0.00
-BasicCity:Rotterdam,592105,-26673.43,-50627.10
-BasicCity:The Hague,548320,-39549.32,-32500.80
-BasicCity:Utrecht,359370,15119.01,-32134.50
-BasicCity:Maastricht,120227,53516.28,-169030.80
-BasicCity:Eindhoven,235691,39962.70,-104284.50
-BasicCity:Groningen,233273,113382.40,93672.90
-BasicCity:Tilburg,221947,12855.56,-91330.80
-BasicCity:Almere,214715,21895.79,-677.10
-BasicCity:Breda,184126,-7983.05,-87012.90
-BasicCity:Nijmegen,177359,65660.27,-58308.30
-BasicCity:Arnhem,164096,69333.29,-43234.50
-BasicCity:Haarlem,162543,-17639.97,1165.50
-BasicCity:Apeldoorn,138945,72721.69,-17327.10
-BasicCity:Enschede,159703,135969.42,-17327.10
-BasicCity:Hoofddorp,157789,-13750.10,-7403.70
-BasicCity:’s-Hertogenbosch,157486,27540.86,-76534.50
-BasicCity:Amersfoort,157462,33185.92,-24730.80
-BasicCity:Zaanstad,156901,-7922.06,10755.90
-BasicCity:Zwolle,129840,81755.14,15972.90
-BasicCity:Zoetermeer,125267,-26673.43,-33977.10
-BasicCity:Leiden,124093,-27351.11,-23620.80
-BasicCity:Leeuwarden,124481,60293.06,91819.20
-BasicCity:Dordrecht,119115,-14590.42,-64047.00
-BasicCity:Alphen aan den Rijn,112587,-15376.53,-26584.50
-BasicCity:Alkmaar,109896,-9731.46,28915.50
-BasicCity:Emmen,107024,135969.42,45565.50
-BasicCity:Delft,103581,-36215.14,-40082.10
-BasicCity:Deventer,101236,85143.53,-13630.80
-BasicRoad:’s-Hertogenbosch-Nijmegen Road,’s-Hertogenbosch,Nijmegen,25,4
-BasicRoad:’s-Hertogenbosch-Nijmegen Road,Nijmegen,’s-Hertogenbosch,25,4
-BasicRoad:Delft-Rotterdam Road,Delft,Rotterdam,25,4
-BasicRoad:Delft-Rotterdam Road,Rotterdam,Delft,25,4
-BasicRoad:The Hague-Zoetermeer Road,The Hague,Zoetermeer,25,4
-BasicRoad:The Hague-Zoetermeer Road,Zoetermeer,The Hague,25,4
-BasicRoad:Leiden-The Hague Road,Leiden,The Hague,25,4
-BasicRoad:Leiden-The Hague Road,The Hague,Leiden,25,4
-BasicRoad:Groningen-Leeuwarden Road,Groningen,Leeuwarden,25,4
-BasicRoad:Groningen-Leeuwarden Road,Leeuwarden,Groningen,25,4
-BasicRoad:Haarlem-Alkmaar Road,Haarlem,Alkmaar,25,4
-BasicRoad:Haarlem-Alkmaar Road,Alkmaar,Haarlem,25,4
-BasicRoad:Rotterdam-Zoetermeer Road,Rotterdam,Zoetermeer,25,4
-BasicRoad:Rotterdam-Zoetermeer Road,Zoetermeer,Rotterdam,25,4
-BasicRoad:Breda-Dordrecht Road,Breda,Dordrecht,25,4
-BasicRoad:Breda-Dordrecht Road,Dordrecht,Breda,25,4
-BasicRoad:Almere-Amersfoort Road,Almere,Amersfoort,25,4
-BasicRoad:Almere-Amersfoort Road,Amersfoort,Almere,25,4
-BasicRoad:Zwolle-Apeldoorn Road,Zwolle,Apeldoorn,25,4
-BasicRoad:Zwolle-Apeldoorn Road,Apeldoorn,Zwolle,25,4
-BasicRoad:Leeuwarden-Emmen Road,Leeuwarden,Emmen,25,4
-BasicRoad:Leeuwarden-Emmen Road,Emmen,Leeuwarden,25,4
-BasicRoad:Hoofddorp-Amsterdam Road,Hoofddorp,Amsterdam,25,4
-BasicRoad:Hoofddorp-Amsterdam Road,Amsterdam,Hoofddorp,25,4
-BasicRoad:Groningen-Zwolle Road,Groningen,Zwolle,25,4
-BasicRoad:Groningen-Zwolle Road,Zwolle,Groningen,25,4
-BasicRoad:’s-Hertogenbosch-Tilburg Road,’s-Hertogenbosch,Tilburg,25,4
-BasicRoad:’s-Hertogenbosch-Tilburg Road,Tilburg,’s-Hertogenbosch,25,4
-BasicRoad:Zaanstad-Alkmaar Road,Zaanstad,Alkmaar,25,4
-BasicRoad:Zaanstad-Alkmaar Road,Alkmaar,Zaanstad,25,4
-BasicRoad:Utrecht-Alphen aan den Rijn Road,Utrecht,Alphen aan den Rijn,25,4
-BasicRoad:Utrecht-Alphen aan den Rijn Road,Alphen aan den Rijn,Utrecht,25,4
-BasicRoad:Enschede-Emmen Road,Enschede,Emmen,25,4
-BasicRoad:Enschede-Emmen Road,Emmen,Enschede,25,4
-BasicRoad:Arnhem-Deventer Road,Arnhem,Deventer,25,4
-BasicRoad:Arnhem-Deventer Road,Deventer,Arnhem,25,4
-BasicRoad:Maastricht-Eindhoven Road,Maastricht,Eindhoven,25,4
-BasicRoad:Maastricht-Eindhoven Road,Eindhoven,Maastricht,25,4
-BasicRoad:Arnhem-Zwolle Road,Arnhem,Zwolle,25,4
-BasicRoad:Arnhem-Zwolle Road,Zwolle,Arnhem,25,4
-BasicRoad:Zoetermeer-Alphen aan den Rijn Road,Zoetermeer,Alphen aan den Rijn,25,4
-BasicRoad:Zoetermeer-Alphen aan den Rijn Road,Alphen aan den Rijn,Zoetermeer,25,4
-BasicRoad:Emmen-Zwolle Road,Emmen,Zwolle,25,4
-BasicRoad:Emmen-Zwolle Road,Zwolle,Emmen,25,4
-BasicRoad:’s-Hertogenbosch-Breda Road,’s-Hertogenbosch,Breda,25,4
-BasicRoad:’s-Hertogenbosch-Breda Road,Breda,’s-Hertogenbosch,25,4
-BasicRoad:Arnhem-Nijmegen Road,Arnhem,Nijmegen,25,4
-BasicRoad:Arnhem-Nijmegen Road,Nijmegen,Arnhem,25,4
-BasicRoad:Eindhoven-’s-Hertogenbosch Road,Eindhoven,’s-Hertogenbosch,25,4
-BasicRoad:Eindhoven-’s-Hertogenbosch Road,’s-Hertogenbosch,Eindhoven,25,4
-BasicRoad:Rotterdam-Dordrecht Road,Rotterdam,Dordrecht,25,4
-BasicRoad:Rotterdam-Dordrecht Road,Dordrecht,Rotterdam,25,4
-BasicRoad:Amersfoort-Utrecht Road,Amersfoort,Utrecht,25,4
-BasicRoad:Amersfoort-Utrecht Road,Utrecht,Amersfoort,25,4
-BasicRoad:Zwolle-Deventer Road,Zwolle,Deventer,25,4
-BasicRoad:Zwolle-Deventer Road,Deventer,Zwolle,25,4
-BasicRoad:Delft-The Hague Road,Delft,The Hague,25,4
-BasicRoad:Delft-The Hague Road,The Hague,Delft,25,4
-BasicRoad:Maastricht-’s-Hertogenbosch Road,Maastricht,’s-Hertogenbosch,25,4
-BasicRoad:Maastricht-’s-Hertogenbosch Road,’s-Hertogenbosch,Maastricht,25,4
-BasicRoad:Enschede-Apeldoorn Road,Enschede,Apeldoorn,25,4
-BasicRoad:Enschede-Apeldoorn Road,Apeldoorn,Enschede,25,4
-BasicRoad:Delft-Zoetermeer Road,Delft,Zoetermeer,25,4
-BasicRoad:Delft-Zoetermeer Road,Zoetermeer,Delft,25,4
-BasicRoad:Leiden-Alphen aan den Rijn Road,Leiden,Alphen aan den Rijn,25,4
-BasicRoad:Leiden-Alphen aan den Rijn Road,Alphen aan den Rijn,Leiden,25,4
-BasicRoad:Enschede-Deventer Road,Enschede,Deventer,25,4
-BasicRoad:Enschede-Deventer Road,Deventer,Enschede,25,4
-BasicRoad:Leiden-Zoetermeer Road,Leiden,Zoetermeer,25,4
-BasicRoad:Leiden-Zoetermeer Road,Zoetermeer,Leiden,25,4
-BasicRoad:Eindhoven-Breda Road,Eindhoven,Breda,25,4
-BasicRoad:Eindhoven-Breda Road,Breda,Eindhoven,25,4
-BasicRoad:Haarlem-Hoofddorp Road,Haarlem,Hoofddorp,25,4
-BasicRoad:Haarlem-Hoofddorp Road,Hoofddorp,Haarlem,25,4
-BasicRoad:Eindhoven-Tilburg Road,Eindhoven,Tilburg,25,4
-BasicRoad:Eindhoven-Tilburg Road,Tilburg,Eindhoven,25,4
-BasicRoad:Amersfoort-Apeldoorn Road,Amersfoort,Apeldoorn,25,4
-BasicRoad:Amersfoort-Apeldoorn Road,Apeldoorn,Amersfoort,25,4
-BasicRoad:Amsterdam-Alkmaar Road,Amsterdam,Alkmaar,25,4
-BasicRoad:Amsterdam-Alkmaar Road,Alkmaar,Amsterdam,25,4
-BasicRoad:Zaanstad-Amsterdam Road,Zaanstad,Amsterdam,25,4
-BasicRoad:Zaanstad-Amsterdam Road,Amsterdam,Zaanstad,25,4
-BasicRoad:Almere-Utrecht Road,Almere,Utrecht,25,4
-BasicRoad:Almere-Utrecht Road,Utrecht,Almere,25,4
-BasicRoad:Groningen-Emmen Road,Groningen,Emmen,25,4
-BasicRoad:Groningen-Emmen Road,Emmen,Groningen,25,4
-BasicRoad:Zaanstad-Hoofddorp Road,Zaanstad,Hoofddorp,25,4
-BasicRoad:Zaanstad-Hoofddorp Road,Hoofddorp,Zaanstad,25,4
-BasicRoad:Nijmegen-Apeldoorn Road,Nijmegen,Apeldoorn,25,4
-BasicRoad:Nijmegen-Apeldoorn Road,Apeldoorn,Nijmegen,25,4
-BasicRoad:Delft-Dordrecht Road,Delft,Dordrecht,25,4
-BasicRoad:Delft-Dordrecht Road,Dordrecht,Delft,25,4
-BasicRoad:Hoofddorp-Alphen aan den Rijn Road,Hoofddorp,Alphen aan den Rijn,25,4
-BasicRoad:Hoofddorp-Alphen aan den Rijn Road,Alphen aan den Rijn,Hoofddorp,25,4
-BasicRoad:Almere-Amsterdam Road,Almere,Amsterdam,25,4
-BasicRoad:Almere-Amsterdam Road,Amsterdam,Almere,25,4
-BasicRoad:Arnhem-Apeldoorn Road,Arnhem,Apeldoorn,25,4
-BasicRoad:Arnhem-Apeldoorn Road,Apeldoorn,Arnhem,25,4
-BasicRoad:Haarlem-Zaanstad Road,Haarlem,Zaanstad,25,4
-BasicRoad:Haarlem-Zaanstad Road,Zaanstad,Haarlem,25,4
-BasicRoad:Leeuwarden-Zwolle Road,Leeuwarden,Zwolle,25,4
-BasicRoad:Leeuwarden-Zwolle Road,Zwolle,Leeuwarden,25,4
-BasicRoad:Haarlem-Amsterdam Road,Haarlem,Amsterdam,25,4
-BasicRoad:Haarlem-Amsterdam Road,Amsterdam,Haarlem,25,4
-BasicRoad:Almere-Zaanstad Road,Almere,Zaanstad,25,4
-BasicRoad:Almere-Zaanstad Road,Zaanstad,Almere,25,4
-BasicRoad:Apeldoorn-Deventer Road,Apeldoorn,Deventer,25,4
-BasicRoad:Apeldoorn-Deventer Road,Deventer,Apeldoorn,25,4
-BasicRoad:Maastricht-Tilburg Road,Maastricht,Tilburg,25,4
-BasicRoad:Maastricht-Tilburg Road,Tilburg,Maastricht,25,4
-BasicRoad:Breda-Tilburg Road,Breda,Tilburg,25,4
-BasicRoad:Breda-Tilburg Road,Tilburg,Breda,25,4
+BasicCity:Utrecht,307840,0.00,0.00
+BasicCity:Amersfoort,141795,18097.32,7104.12
+BasicCity:Veenendaal,67381,29269.50,-7567.43
+BasicCity:Nieuwegein,64053,-2850.58,-6949.68
+BasicCity:Zeist,53880,7591.14,-154.44
+BasicCity:Houten,46675,3135.73,-7104.12
+BasicCity:Soest,39595,11554.86,9111.81
+BasicCity:Maarssen,38915,-5497.58,5250.87
+BasicCity:Woerden,37930,-16322.98,-772.19
+BasicCity:IJsselstein,33684,-5417.27,-8030.74
+BasicCity:Leusden,27483,21139.87,4633.12
+BasicCity:Baarn,24580,11261.22,13281.62
+BasicCity:Bilthoven,22700,5403.97,4169.81
+BasicRoad:Utrecht_Bilthoven,Utrecht,Bilthoven,25,3
+BasicRoad:Utrecht_Bilthoven_reverse,Bilthoven,Utrecht,25,3
+BasicRoad:Utrecht_Nieuwegein,Utrecht,Nieuwegein,25,3
+BasicRoad:Utrecht_Nieuwegein_reverse,Nieuwegein,Utrecht,25,3
+BasicRoad:Utrecht_Zeist,Utrecht,Zeist,25,3
+BasicRoad:Utrecht_Zeist_reverse,Zeist,Utrecht,25,3
+BasicRoad:Amersfoort_Leusden,Amersfoort,Leusden,25,3
+BasicRoad:Amersfoort_Leusden_reverse,Leusden,Amersfoort,25,3
+BasicRoad:Amersfoort_Soest,Amersfoort,Soest,25,3
+BasicRoad:Amersfoort_Soest_reverse,Soest,Amersfoort,25,3
+BasicRoad:Amersfoort_Baarn,Amersfoort,Baarn,25,3
+BasicRoad:Amersfoort_Baarn_reverse,Baarn,Amersfoort,25,3
+BasicRoad:Veenendaal_Leusden,Veenendaal,Leusden,25,3
+BasicRoad:Veenendaal_Leusden_reverse,Leusden,Veenendaal,25,3
+BasicRoad:Veenendaal_Amersfoort,Veenendaal,Amersfoort,25,3
+BasicRoad:Veenendaal_Amersfoort_reverse,Amersfoort,Veenendaal,25,3
+BasicRoad:Veenendaal_Zeist,Veenendaal,Zeist,25,3
+BasicRoad:Veenendaal_Zeist_reverse,Zeist,Veenendaal,25,3
+BasicRoad:Nieuwegein_IJsselstein,Nieuwegein,IJsselstein,25,3
+BasicRoad:Nieuwegein_IJsselstein_reverse,IJsselstein,Nieuwegein,25,3
+BasicRoad:Nieuwegein_Houten,Nieuwegein,Houten,25,3
+BasicRoad:Nieuwegein_Houten_reverse,Houten,Nieuwegein,25,3
+BasicRoad:Zeist_Bilthoven,Zeist,Bilthoven,25,3
+BasicRoad:Zeist_Bilthoven_reverse,Bilthoven,Zeist,25,3
+BasicRoad:Zeist_Houten,Zeist,Houten,25,3
+BasicRoad:Zeist_Houten_reverse,Houten,Zeist,25,3
+BasicRoad:Houten_Utrecht,Houten,Utrecht,25,3
+BasicRoad:Houten_Utrecht_reverse,Utrecht,Houten,25,3
+BasicRoad:Soest_Baarn,Soest,Baarn,25,3
+BasicRoad:Soest_Baarn_reverse,Baarn,Soest,25,3
+BasicRoad:Soest_Bilthoven,Soest,Bilthoven,25,3
+BasicRoad:Soest_Bilthoven_reverse,Bilthoven,Soest,25,3
+BasicRoad:Maarssen_Utrecht,Maarssen,Utrecht,25,3
+BasicRoad:Maarssen_Utrecht_reverse,Utrecht,Maarssen,25,3
+BasicRoad:Maarssen_Bilthoven,Maarssen,Bilthoven,25,3
+BasicRoad:Maarssen_Bilthoven_reverse,Bilthoven,Maarssen,25,3
+BasicRoad:Maarssen_Woerden,Maarssen,Woerden,25,3
+BasicRoad:Maarssen_Woerden_reverse,Woerden,Maarssen,25,3
+BasicRoad:Woerden_IJsselstein,Woerden,IJsselstein,25,3
+BasicRoad:Woerden_IJsselstein_reverse,IJsselstein,Woerden,25,3
+BasicRoad:Woerden_Nieuwegein,Woerden,Nieuwegein,25,3
+BasicRoad:Woerden_Nieuwegein_reverse,Nieuwegein,Woerden,25,3
+BasicRoad:IJsselstein_Houten,IJsselstein,Houten,25,3
+BasicRoad:IJsselstein_Houten_reverse,Houten,IJsselstein,25,3
+BasicRoad:IJsselstein_Utrecht,IJsselstein,Utrecht,25,3
+BasicRoad:IJsselstein_Utrecht_reverse,Utrecht,IJsselstein,25,3
+BasicRoad:Leusden_Soest,Leusden,Soest,25,3
+BasicRoad:Leusden_Soest_reverse,Soest,Leusden,25,3
+BasicRoad:Leusden_Baarn,Leusden,Baarn,25,3
+BasicRoad:Leusden_Baarn_reverse,Baarn,Leusden,25,3
+BasicRoad:Baarn_Bilthoven,Baarn,Bilthoven,25,3
+BasicRoad:Baarn_Bilthoven_reverse,Bilthoven,Baarn,25,3

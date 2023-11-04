@@ -13,7 +13,9 @@ if TYPE_CHECKING:
 
 
 class GameRoadView(GameView):
-    def __init__(self, *, game: 'Game', edge_id: int):
+    def __init__(self, *,
+                 game: 'Game', edge_id: int,
+                 pan_offset_x: float = 0):
         self.game = game
         self.edge_id = edge_id
         self.screen = game.screen
@@ -46,7 +48,7 @@ class GameRoadView(GameView):
 
         self.state = GameRoadState(
             scale=1,
-            pan_offset_x=0,
+            pan_offset_x=pan_offset_x,
             pan_offset_y=0,
             prev_cars={},
             next_cars={},

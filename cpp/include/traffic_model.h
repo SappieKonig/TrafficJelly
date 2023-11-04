@@ -38,11 +38,12 @@ private:
     std::unordered_map<std::string, std::shared_ptr<Edge>> labelToEdge;
     int population;
     std::vector<std::shared_ptr<Edge>> edges;
+    float scale;
 public:
     std::default_random_engine generator;
     std::uniform_real_distribution<float> distribution;
     std::vector<std::vector<float>> mappingProbabilities;
-    TrafficModel(std::string fn, float delta_time);
+    TrafficModel(std::string fn, float delta_time, float scale);
     // Model usage and interpretation
     void spawnCar();
     void step();

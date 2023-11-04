@@ -10,6 +10,7 @@ from graphviz.view.game_road_view import GameRoadView
 
 
 DELTA_TIME = 0.2
+SCALE = 1/3
 
 # fromNode, toNode, timeTaken, startTime
 ArrivalStats = tuple[int, int, float, float]
@@ -23,9 +24,10 @@ def plot_arrival_stats_hist(arrival_stats: list[ArrivalStats], from_node_id: int
 
 def main():
     cars_per_edge = []
-    simulation = TrafficModel("graph.txt", DELTA_TIME)
+    simulation = TrafficModel("graph.txt", DELTA_TIME, SCALE)
     start = time.time()
-    for i in range(100000):
+    steps_per_day = int(86400 / DELTA_TIME * SCALE)
+    for i in range(steps_per_day):
         if i % 100 == 0:
             cars_per_edge.append(simulation.get_n_cars_per_edge())
             time_taken = time.time() - start

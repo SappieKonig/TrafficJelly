@@ -11,8 +11,8 @@
 #include <vector>
 #include <chrono>
 
-TrafficModel::TrafficModel(std::string fn, float delta_time)
-    : delta_time(delta_time), population(0), global_time(0)
+TrafficModel::TrafficModel(std::string fn, float delta_time, float scale)
+    : delta_time(delta_time), population(0), global_time(0), scale(scale)
 {
     std::ifstream file(fn);
     std::string str(std::istreambuf_iterator<char>{file}, {});
@@ -26,7 +26,9 @@ TrafficModel::TrafficModel(std::string fn, float delta_time)
     std::vector<int> populations;
     populations.reserve(nodes.size());
     for (auto& node : nodes) {
-        populations.push_back(node->population);
+        populations.push_back(node->population * scale);
+        node->x *= scale;
+        node->y *= scale;
     }
     population = std::accumulate(populations.begin(), populations.end(), 0);
     mappingProbabilities = computeProbabilities(populations);
@@ -46,7 +48,7 @@ void TrafficModel::step()
     }
     spawnCars();
     transferCars();
-    global_time += delta_time;
+    global_time += delta_time / scale;
 }
 
 void TrafficModel::spawnCar() {
@@ -72,6 +74,11 @@ void TrafficModel::spawnCars() {
 //    } else {
 //        spawn_prob = 0;
 //    }
+    // Multiply spawn_prob by 4 if between 7 and 9 and 16 and 18
+    int hour = (int) global_time % 86400 / 3600;
+    if ((hour >= 7 && hour < 9) || (hour >= 16 && hour < 18)) {
+        spawn_prob *= 4;
+    }
     while (spawn_prob > 1) {
         spawnCar();
         spawn_prob -= 1;
@@ -160,7 +167,7 @@ BasicCityStringCommand::BasicCityStringCommand(TrafficModelBuilder& trafficModel
 
 void BasicCityStringCommand::apply(std::vector<std::string>& args) const
 {
-    trafficModelBuilder.addBasicCity(args[0], std::stoi(args[1]) / 3, std::stof(args[2]) / 3, std::stof(args[3]) / 3);
+    trafficModelBuilder.addBasicCity(args[0], std::stoi(args[1]), std::stof(args[2]), std::stof(args[3]));
 }
 
 BasicRoadStringCommand::BasicRoadStringCommand(TrafficModelBuilder& trafficModelBuilder)
@@ -225,7 +232,7 @@ int TrafficModel::getNCarsInSimulation() {
 
 PYBIND11_MODULE(traffic_model, m) {
     pybind11::class_<TrafficModel>(m, "TrafficModel")
-        .def(pybind11::init<const std::string &, float>())
+        .def(pybind11::init<const std::string &, float, float>())
         .def("step_forward", &TrafficModel::step)
         .def("display", &TrafficModel::display)
         .def("get_edge_ids", &TrafficModel::getEdgeIDs)

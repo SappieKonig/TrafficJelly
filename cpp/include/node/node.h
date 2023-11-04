@@ -21,8 +21,8 @@
 
 class Node {
     std::string const label;
-    float x, y;
 public:
+    float x, y;
     std::vector<std::tuple<int, int, float, float>> travelStats;
     int population;
     int id;

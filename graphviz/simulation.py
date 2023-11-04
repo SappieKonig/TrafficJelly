@@ -136,7 +136,7 @@ class Simulation:
     def get_edge_ids(self) -> list[int]:
         return list(self.__edges.keys())
 
-    def get_car_ids_in_edge_on_interval(self, edge_id: int, interval: tuple[int, int]):
+    def get_car_ids_in_edge_on_interval(self, edge_id: int, interval: tuple[float, float]):
         x_start, x_end = interval
         return [car_id for car_id in self.__edges[edge_id].car_ids if x_start <= self.__cars[car_id].x <= x_end]
 

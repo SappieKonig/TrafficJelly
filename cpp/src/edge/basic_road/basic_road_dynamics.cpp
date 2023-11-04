@@ -33,7 +33,7 @@ std::unique_ptr<Action> BasicRoadDynamics::getAction(const Observation &observat
     // we want to try and keep cruising
     if (!observation.front.has_value() ||
             (observation.front->dx > margin &&
-             observation.front->dv > -10)) {
+             observation.front->dv < -10)) {
         return std::make_unique<CruiseAction>();
     }
 
@@ -41,10 +41,10 @@ std::unique_ptr<Action> BasicRoadDynamics::getAction(const Observation &observat
     if (observation.leftLaneExists) {
         bool front_safe = !observation.left_front.has_value() ||
                 (observation.left_front->dx > margin &&
-                 observation.left_front->dv > -10);
+                 observation.left_front->dv < -10);
         bool back_safe = !observation.left_back.has_value() ||
                 (observation.left_back->dx < -margin &&
-                 observation.left_back->dv < 10);
+                 observation.left_back->dv > 10);
         if (front_safe && back_safe) {
             std::vector<std::unique_ptr<Action>> actions;
             actions.push_back(std::make_unique<ToLeftLaneAction>());

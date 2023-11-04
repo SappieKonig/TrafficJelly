@@ -3,7 +3,7 @@
 
 
 std::default_random_engine Car::generator(time(0));
-std::normal_distribution<double> Car::normalDistribution(30, 3);
+std::normal_distribution<double> Car::normalDistribution(0, 3);
 
 
 Car::Car(std::vector<int> path, float global_time) :
@@ -11,9 +11,9 @@ Car::Car(std::vector<int> path, float global_time) :
 {
     fromNodeID = path[0];
     toNodeID = path[path.size() - 1];
-    v = (float) normalDistribution(generator);
+    v = 20;
     // offset random number between -5 and 5
-    offset = (float) (normalDistribution(generator) - 30);
+    offset = (float) (normalDistribution(generator));
     if (offset < -5) {
         offset = -5;
     } else if (offset > 5) {

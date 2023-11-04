@@ -25,7 +25,6 @@ def plot_arrival_stats_hist(arrival_stats: list[ArrivalStats], from_node_id: int
 def main():
     cars_per_edge = []
     simulation = TrafficModel("graph.txt", DELTA_TIME, SCALE)
-    print(simulation.get_label_from_node_id(0))
     start = time.time()
     steps_per_day = int(3600 * 9 / DELTA_TIME * SCALE)
     for i in range(steps_per_day):
@@ -40,6 +39,7 @@ def main():
         simulation.step_forward()
     # simulation = create_simulation()
     arrival_stats = simulation.get_travel_stats()
+    filtered_arrival_stats = [arrival_stat for arrival_stat in arrival_stats if arrival_stat[0] == 0 and arrival_stat[1] == 1]
     # plot_arrival_stats_hist(arrival_stats, 0, 1)
     game = Game(simulation=simulation)
     game.push_view(GameGraphView(game=game))

@@ -30,6 +30,9 @@ TrafficModel::TrafficModel(std::string fn, float delta_time, float scale)
         node->x *= scale;
         node->y *= scale;
     }
+    for (auto& edge : edges) {
+        edge -> length *= scale;
+    }
     population = std::accumulate(populations.begin(), populations.end(), 0);
     mappingProbabilities = computeProbabilities(populations);
     generator = std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count());

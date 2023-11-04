@@ -21,13 +21,13 @@ class Edge
 protected:
     // To keep track of every car in the driving order.
     std::list<std::unique_ptr<Car>> cars;
-    float length; // In meters
     float const speedLimit; // in m/s
     int id;
 
     Node& inNode;
     std::string const label;
 public:
+    float length; // In meters
 
     Node& outNode;
     Edge(Node& inNode, Node& outNode, std::string label, float speedLimit);

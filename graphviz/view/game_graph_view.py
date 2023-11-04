@@ -203,11 +203,11 @@ class GameGraphView(GameView):
         edge = self.edges[edge_id]
         offset = self.get_offset() + edge.offset
         p0_to_p1 = (edge.pos1 - edge.pos0) * self.scale
-        p0_to_p2 = pos - (edge.pos0 * self.scale + offset)
+        p0_to_pos = pos - (edge.pos0 * self.scale + offset)
         # noinspection PyUnreachableCode
 
         # distance in pixels between the edge and pos if edge were to be infinitely extended
-        distance_in_pixels = np.linalg.norm(np.cross(p0_to_p1, p0_to_p2)) / np.linalg.norm(p0_to_p1)
+        distance_in_pixels = np.linalg.norm(np.cross(p0_to_p1, p0_to_pos)) / np.linalg.norm(p0_to_p1)
 
         # start_to_end_ratio is equal to 0 when clicked on the start, and equal to 1 when clicked on the end of the edge
         # If the position when projected onto the edge is outside the edge, then it is of course less than 0 if the
@@ -215,7 +215,7 @@ class GameGraphView(GameView):
         #
         # -1    0    1    2
         #       |----|
-        start_to_end_ratio = np.dot(p0_to_p1, p0_to_p2) / np.dot(p0_to_p1, p0_to_p1)
+        start_to_end_ratio = np.dot(p0_to_p1, p0_to_pos) / np.dot(p0_to_p1, p0_to_p1)
 
         return distance_in_pixels, start_to_end_ratio
 

@@ -17,10 +17,10 @@ std::unique_ptr<Action> BasicRoadDynamics::getAction(const Observation &observat
     if (observation.rightLaneExists) {
         bool front_safe = !observation.right_front.has_value() ||
                 (observation.right_front->dx > margin &&
-                 observation.right_front->dv > -10);
+                 observation.right_front->dv < -10);
         bool back_safe = !observation.right_back.has_value() ||
                 (observation.right_back->dx < -margin &&
-                 observation.right_back->dv < 10);
+                 observation.right_back->dv > 10);
         if (front_safe && back_safe) {
             std::vector<std::unique_ptr<Action>> actions;
             actions.push_back(std::make_unique<ToRightLaneAction>());

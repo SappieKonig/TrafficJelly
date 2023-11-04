@@ -68,7 +68,7 @@ void TrafficModel::spawnCar() {
 
 void TrafficModel::spawnCars() {
     // Calculate spawns
-    float spawn_prob = (float) population * 0.2f / 86400.0f * delta_time;
+    float spawn_prob = (float) population * 0.1f / 86400.0f * delta_time;
 //    if (global_time == 0) {
 //        spawn_prob = 1;
 //    } else {

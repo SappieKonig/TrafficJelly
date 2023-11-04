@@ -87,6 +87,10 @@ public:
         return nodes[nodeID]->getLabel();
     }
 
+    std::string getLabelFromEdgeID(int edgeID) {
+        return edges[edgeID]->getLabel();
+    }
+
     int getNCarsInSimulation();
 
     std::vector<int> getNCarsPerEdge() {

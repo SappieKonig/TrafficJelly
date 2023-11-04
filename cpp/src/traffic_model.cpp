@@ -254,6 +254,7 @@ PYBIND11_MODULE(traffic_model, m) {
         .def("get_n_cars_in_simulation", &TrafficModel::getNCarsInSimulation)
         .def("get_n_cars_per_edge", &TrafficModel::getNCarsPerEdge)
         .def("get_travel_stats", &TrafficModel::getTravelStats)
-        .def("get_label_from_node_id", &TrafficModel::getLabelFromNodeID);
+        .def("get_label_from_node_id", &TrafficModel::getLabelFromNodeID)
+        .def("get_label_from_edge_id", &TrafficModel::getLabelFromEdgeID);
 }
 

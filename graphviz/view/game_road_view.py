@@ -86,11 +86,8 @@ class GameRoadView(GameView):
     def update_viewport(self):
         dt = self.game.dt
         if dt != 0:
-            screen_center = self.get_screen_center()
             scale_factor = self.scale_rate ** (dt * self.scale_rate_multiplier)
             self.state.scale *= scale_factor
-            self.state.pan_offset_x -= (scale_factor - 1) * screen_center.x / self.state.scale
-            self.state.pan_offset_y -= (scale_factor - 1) * screen_center.y / self.state.scale
         self.state.pan_offset_x += dt * self.pan_rate_x * self.pan_rate_multiplier / self.state.scale
         self.state.pan_offset_y += dt * self.pan_rate_y * self.pan_rate_multiplier / self.state.scale
 
@@ -112,7 +109,7 @@ class GameRoadView(GameView):
         self.draw_info()
 
     def draw_road(self):
-        offset = self.get_scaled_offset()
+        offset = self.get_offset()
         road_rect = pygame.rect.Rect((
             0, 0,
             self.road_length * self.state.scale,
@@ -124,7 +121,7 @@ class GameRoadView(GameView):
         pygame.draw.rect(self.screen, 'black', road_rect)
 
     def draw_cars(self):
-        offset = self.get_scaled_offset()
+        offset = self.get_offset()
 
         scale = self.state.scale
         # alpha = 0 -> interpolation is in next_cars
@@ -177,18 +174,15 @@ class GameRoadView(GameView):
     def get_displayed_cars_interval(self):
         screen_rect = self.screen.get_rect()
         max_speed_buffer = self.game.dt * self.max_speed
-        center = -self.get_offset().x + self.get_screen_center().x / self.state.scale
+        center = -self.get_offset().x / self.state.scale + self.get_screen_center().x / self.state.scale
         radius = (screen_rect.width * 0.5 + max_speed_buffer) / self.state.scale + self.marginal_buffer
         return center - radius, center + radius
-
-    def get_scaled_offset(self):
-        return self.get_offset() * self.state.scale
 
     def get_offset(self):
         return self.get_screen_center() + pygame.Vector2(
             self.state.pan_offset_x,
             self.state.pan_offset_y,
-        )
+        ) * self.state.scale
 
     def get_screen_center(self) -> pygame.Vector2:
         return pygame.Vector2(self.screen.get_rect().center)

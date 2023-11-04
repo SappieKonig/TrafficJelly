@@ -29,8 +29,8 @@ class GameRoadView(GameView):
         self.car_width = self.lane_width
         # self.car_width = 2  # True car width
 
-        self.lane_count = simulation.get_edge_lane_count(edge_id)
-        self.road_length = simulation.get_edge_road_length(edge_id)
+        self.lane_count = game.simulation.get_edge_lane_count(edge_id)
+        self.road_length = game.simulation.get_edge_road_length(edge_id)
 
         self.marginal_buffer = 100  # m
         self.scale_rate_base = 2  # multiplier per second

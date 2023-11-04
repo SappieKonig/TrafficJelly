@@ -74,10 +74,13 @@ void TrafficModel::spawnCars() {
 //    } else {
 //        spawn_prob = 0;
 //    }
-    // Multiply spawn_prob by 4 if between 7 and 9 and 16 and 18
+    // Multiply spawn_prob by 6 if between 7 and 9 and 17 and 19
     int hour = (int) global_time % 86400 / 3600;
-    if ((hour >= 7 && hour < 9) || (hour >= 16 && hour < 18)) {
-        spawn_prob *= 4;
+    if ((hour >= 7 && hour < 9) || (hour >= 17 && hour < 19)) {
+        spawn_prob *= 6;
+    }
+    else {
+        spawn_prob *= 0;
     }
     while (spawn_prob > 1) {
         spawnCar();

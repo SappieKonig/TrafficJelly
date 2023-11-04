@@ -6,8 +6,8 @@ std::default_random_engine Car::generator(time(0));
 std::normal_distribution<double> Car::normalDistribution(0, 3);
 
 
-Car::Car(std::vector<int> path, float global_time) :
-    path(path), global_time(global_time)
+Car::Car(std::vector<int> path, float global_time, float scale) :
+    path(path), global_time(global_time), scale(scale)
 {
     fromNodeID = path[0];
     toNodeID = path[path.size() - 1];
@@ -28,7 +28,7 @@ void Car::step(float dt)
         action->apply(*this, dt);
     }
     x += v * dt;
-    age += dt;
+    age += dt / scale;
 }
 
 void Car::accelerate(float dt)

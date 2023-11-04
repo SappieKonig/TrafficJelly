@@ -30,6 +30,7 @@ private:
 
     std::unique_ptr<Action> action = nullptr;
     BasicRoadDynamics dynamics = {};
+    float scale;
 
     // Decision maker for graph traversal
 //    std::unique_ptr<RoutePlanner> routePlanner;
@@ -40,7 +41,7 @@ public:
     int fromNodeID, toNodeID;
 
 //    Car(std::unique_ptr<RoutePlanner> routePlanner);
-    Car(std::vector<int> path, float global_time);
+    Car(std::vector<int> path, float global_time, float scale);
     void syncCarToEdge(float targetSpeed) {
         baseTarget = targetSpeed;
         x = 0;

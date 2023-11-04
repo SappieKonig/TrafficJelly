@@ -9,6 +9,7 @@
 #include <iostream>
 #include <memory>
 #include <vector>
+#include <chrono>
 
 TrafficModel::TrafficModel(std::string fn, float delta_time)
     : delta_time(delta_time), population(0), global_time(0)

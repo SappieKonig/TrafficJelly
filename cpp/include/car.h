@@ -63,7 +63,7 @@ public:
     friend ToRightLaneAction;
     friend CompositeAction;
 
-    float getTarget() const { return baseTarget + offset; }
+    float getTarget() const { return baseTarget + offset + 2 * lane; }
 
     void accelerate(float dt);
     void softBrake(float dt);

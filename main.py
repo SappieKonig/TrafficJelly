@@ -25,6 +25,7 @@ def plot_arrival_stats_hist(arrival_stats: list[ArrivalStats], from_node_id: int
 def main():
     cars_per_edge = []
     simulation = TrafficModel("graph.txt", DELTA_TIME, SCALE)
+    print(simulation.get_label_from_node_id(0))
     start = time.time()
     steps_per_day = int(3600 * 9 / DELTA_TIME * SCALE)
     for i in range(steps_per_day):

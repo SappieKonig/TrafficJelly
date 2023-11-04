@@ -83,6 +83,10 @@ public:
 
     void spawnCars();
 
+    std::string getLabelFromNodeID(int nodeID) {
+        return nodes[nodeID]->getLabel();
+    }
+
     int getNCarsInSimulation();
 
     std::vector<int> getNCarsPerEdge() {

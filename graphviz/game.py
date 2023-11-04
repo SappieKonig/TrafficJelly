@@ -35,6 +35,10 @@ class Game:
     def push_view(self, view: GameView):
         self.views.append(view)
 
+    def pop_view(self):
+        if len(self.views) > 1:
+            self.views.pop()
+
     def main(self):
         self.loop()
         pygame.quit()
@@ -62,6 +66,8 @@ class Game:
                 self.state.time_scale /= self.time_scale_rate
             if event.key == pygame.K_SPACE:
                 self.toggle_pause()
+            if event.key == pygame.K_ESCAPE:
+                self.pop_view()
         self.view.on_event(event)
 
     def update_viewport(self):

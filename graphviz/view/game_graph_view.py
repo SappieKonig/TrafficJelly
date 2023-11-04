@@ -3,8 +3,10 @@ from collections import defaultdict
 from dataclasses import dataclass
 from typing import TypeVar, TYPE_CHECKING
 
+import numpy as np
 import pygame
 
+from graphviz.view.game_road_view import GameRoadView
 from graphviz.view.game_view import GameView
 
 if TYPE_CHECKING:
@@ -173,6 +175,49 @@ class GameGraphView(GameView):
                 self.pan_rate_x = 0
             if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
                 self.pan_rate_y = 0
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            self.on_mouse_down(event)
+
+    def on_mouse_down(self, event):
+        offset = self.get_offset()
+        mouse_pos = event.pos
+        sim_position = (mouse_pos - offset) / self.scale
+        for node in self.nodes.values():
+            if (node.pos - sim_position).length() * self.scale <= self.get_node_radius(node):
+                # DEBUG: You can add some debug print statements here that extract information from the model
+                # If the user clicks on a node, there is no need to check whether the user clicked on an edge
+                # As a result. We will return.
+                return
+        for edge_id, edge in self.edges.items():
+            distance, ratio = self.get_distance_in_pixels_and_start_to_end_ratio_of_edge(edge_id, mouse_pos)
+            edge_is_clicked = self.distance_is_within_edge_width(distance) and 0 <= ratio <= 1
+            if edge_is_clicked:
+                # DEBUG: You can add some debug print statements here that extract information from the model
+                pan_offset_x = ratio * (edge.pos0 - edge.pos1).length()
+                self.game.push_view(GameRoadView(game=self.game, edge_id=edge_id, pan_offset_x=pan_offset_x))
+
+    def distance_is_within_edge_width(self, distance):
+        return distance < self.style.edge_width_base / 2
+
+    def get_distance_in_pixels_and_start_to_end_ratio_of_edge(self, edge_id: int, pos: pygame.Vector2) -> tuple[float, float]:
+        edge = self.edges[edge_id]
+        offset = self.get_offset() + edge.offset
+        p0_to_p1 = (edge.pos1 - edge.pos0) * self.scale
+        p0_to_p2 = pos - (edge.pos0 * self.scale + offset)
+        # noinspection PyUnreachableCode
+
+        # distance in pixels between the edge and pos if edge were to be infinitely extended
+        distance_in_pixels = np.linalg.norm(np.cross(p0_to_p1, p0_to_p2)) / np.linalg.norm(p0_to_p1)
+
+        # start_to_end_ratio is equal to 0 when clicked on the start, and equal to 1 when clicked on the end of the edge
+        # If the position when projected onto the edge is outside the edge, then it is of course less than 0 if the
+        # projection is before the start of the edge and greater than 1 in the projection is after the end of the edge.
+        #
+        # -1    0    1    2
+        #       |----|
+        start_to_end_ratio = np.dot(p0_to_p1, p0_to_p2) / np.dot(p0_to_p1, p0_to_p1)
+
+        return distance_in_pixels, start_to_end_ratio
 
     def update_viewport(self):
         dt = self.game.dt
@@ -197,9 +242,7 @@ class GameGraphView(GameView):
 
     def draw_edge(self, edge: VizEdge):
         sim = self.simulation
-        offset = self.get_offset()
-        real_offset = offset + edge.offset
-
+        offset_in_pixels = self.get_offset() + edge.offset
         dist_in_meters = sim.get_edge_road_length(edge.id)
         dist_in_pixels = (edge.pos0 - edge.pos1).length() * self.scale
         meter_per_pixel = dist_in_meters / dist_in_pixels
@@ -208,12 +251,12 @@ class GameGraphView(GameView):
         hist, edges = sim.get_car_count_histogram_in_edge(edge.id, bin_distance)
 
         pygame.draw.line(self.screen, 'black',
-                         real_offset + self.scale_and_round(edge.pos0),
-                         real_offset + self.scale_and_round(edge.pos1),
+                         offset_in_pixels + self.scale_and_round(edge.pos0),
+                         offset_in_pixels + self.scale_and_round(edge.pos1),
                          width=self.style.edge_width_base)
         pygame.draw.line(self.screen, 'white',
-                         real_offset + self.scale_and_round(edge.pos0),
-                         real_offset + self.scale_and_round(edge.pos1),
+                         offset_in_pixels + self.scale_and_round(edge.pos0),
+                         offset_in_pixels + self.scale_and_round(edge.pos1),
                          width=self.style.edge_inner_width)
 
         density_interval_dist_padding = self.density_interval_pixel_padding * meter_per_pixel
@@ -234,8 +277,8 @@ class GameGraphView(GameView):
                 pos_start = edge.pos0 + (dist_start / dist_in_meters) * (edge.pos1 - edge.pos0)
                 pos_end = edge.pos0 + (dist_end / dist_in_meters) * (edge.pos1 - edge.pos0)
                 pygame.draw.line(self.screen, color,
-                                 real_offset + self.scale_and_round(pos_start),
-                                 real_offset + self.scale_and_round(pos_end),
+                                 offset_in_pixels + self.scale_and_round(pos_start),
+                                 offset_in_pixels + self.scale_and_round(pos_end),
                                  width=self.style.edge_inner_width)
 
     def draw_node(self, node: VizNode):

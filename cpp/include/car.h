@@ -35,6 +35,9 @@ private:
 //    std::unique_ptr<RoutePlanner> routePlanner;
 
 public:
+    float age = 0; // in s
+    int fromNodeID, toNodeID;
+
 //    Car(std::unique_ptr<RoutePlanner> routePlanner);
     Car(std::vector<int> path);
     void syncCarToEdge(float targetSpeed) {

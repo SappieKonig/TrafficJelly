@@ -160,7 +160,7 @@ BasicCityStringCommand::BasicCityStringCommand(TrafficModelBuilder& trafficModel
 
 void BasicCityStringCommand::apply(std::vector<std::string>& args) const
 {
-    trafficModelBuilder.addBasicCity(args[0], std::stoi(args[1]), std::stof(args[2]), std::stof(args[3]));
+    trafficModelBuilder.addBasicCity(args[0], std::stoi(args[1]) / 3, std::stof(args[2]) / 3, std::stof(args[3]) / 3);
 }
 
 BasicRoadStringCommand::BasicRoadStringCommand(TrafficModelBuilder& trafficModelBuilder)
@@ -211,6 +211,17 @@ void TrafficModelBuilder::build(std::string file_content)
     }
 }
 
+int TrafficModel::getNCarsInSimulation() {
+    int n = 0;
+    for (auto& node : nodes) {
+        n += node->getNCars();
+    }
+    for (auto& edge : edges) {
+        n += edge->getNCars();
+    }
+    return n;
+}
+
 
 PYBIND11_MODULE(traffic_model, m) {
     pybind11::class_<TrafficModel>(m, "TrafficModel")
@@ -226,6 +237,9 @@ PYBIND11_MODULE(traffic_model, m) {
         .def("get_car_count_histogram_in_edge", &TrafficModel::getCarCountHistInEdge)
         .def("get_car_count_in_node", &TrafficModel::getCarCountInNode)
         .def("get_fastest_path", &TrafficModel::getFastestPath)
-        .def("get_delta_time", &TrafficModel::getDeltaTime);
+        .def("get_delta_time", &TrafficModel::getDeltaTime)
+        .def("get_n_cars_in_simulation", &TrafficModel::getNCarsInSimulation)
+        .def("get_n_cars_per_edge", &TrafficModel::getNCarsPerEdge)
+        .def("get_travel_stats", &TrafficModel::getTravelStats);
 }
 

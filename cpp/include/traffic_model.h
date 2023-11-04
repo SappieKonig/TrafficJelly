@@ -16,6 +16,8 @@
 #include "edge/edge.h"
 #include "route.h"
 
+#define TravelStats std::tuple<int, int, float>
+
 class TrafficModelBuilder;
 
 /*
@@ -79,6 +81,25 @@ public:
     float getDeltaTime() const { return delta_time; }
 
     void spawnCars();
+
+    int getNCarsInSimulation();
+
+    std::vector<int> getNCarsPerEdge() {
+        std::vector<int> nCarsPerEdge;
+        nCarsPerEdge.reserve(edges.size());
+        for (auto& edge : edges) {
+            nCarsPerEdge.push_back(edge->getNCars());
+        }
+        return nCarsPerEdge;
+    }
+
+    std::vector<TravelStats> getTravelStats() {
+        std::vector<TravelStats> travelStats;
+        for (auto& node : nodes) {
+            travelStats.insert(travelStats.end(), node->travelStats.begin(), node->travelStats.end());
+        }
+        return travelStats;
+    }
 };
 
 /*

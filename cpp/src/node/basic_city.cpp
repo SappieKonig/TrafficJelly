@@ -21,6 +21,7 @@ void BasicCity::distributeCars() {
             car->path.erase(car->path.begin());
         }
         if (car->path.empty()) {
+            travelStats.emplace_back(car->fromNodeID, car->toNodeID, car->age);
             continue;
         }
         int nextNode = car->path[0];

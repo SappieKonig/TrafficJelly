@@ -7,8 +7,10 @@ std::normal_distribution<double> Car::normalDistribution(30, 3);
 
 
 Car::Car(std::vector<int> path) :
-    path(std::move(path))
+    path(path)
 {
+    fromNodeID = path[0];
+    toNodeID = path[path.size() - 1];
     v = (float) normalDistribution(generator);
     offset = 0;
     lane = 0;
@@ -20,6 +22,7 @@ void Car::step(float dt)
         action->apply(*this, dt);
     }
     x += v * dt;
+    age += dt;
 }
 
 void Car::accelerate(float dt)

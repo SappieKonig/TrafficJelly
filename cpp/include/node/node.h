@@ -23,6 +23,7 @@ class Node {
     std::string const label;
     float x, y;
 public:
+    std::vector<std::tuple<int, int, float>> travelStats;
     int population;
     int id;
     Node(std::string label, float x, float y, int population);

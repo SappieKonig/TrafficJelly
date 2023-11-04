@@ -193,7 +193,7 @@ class GameGraphView(GameView):
             edge_is_clicked = self.distance_is_within_edge_width(distance) and 0 <= ratio <= 1
             if edge_is_clicked:
                 # DEBUG: You can add some debug print statements here that extract information from the model
-                pan_offset_x = ratio * (edge.pos0 - edge.pos1).length()
+                pan_offset_x = ratio * -(edge.pos1 - edge.pos0).length()
                 self.game.push_view(GameRoadView(game=self.game, edge_id=edge_id, pan_offset_x=pan_offset_x))
 
     def distance_is_within_edge_width(self, distance):

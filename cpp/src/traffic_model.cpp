@@ -56,7 +56,7 @@ void TrafficModel::spawnCar() {
             p -= mappingProbabilities[i][j];
             if (p < 0) {
                 auto path = getFastestPath(i, j);
-                nodes[i]->spawnCar(path);
+                nodes[i]->spawnCar(path, global_time);
                 return;
             }
         }

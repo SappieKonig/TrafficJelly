@@ -16,7 +16,7 @@
 #include "edge/edge.h"
 #include "route.h"
 
-#define TravelStats std::tuple<int, int, float>
+#define TravelStats std::tuple<int, int, float, float>
 
 class TrafficModelBuilder;
 

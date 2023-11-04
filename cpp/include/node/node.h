@@ -23,7 +23,7 @@ class Node {
     std::string const label;
     float x, y;
 public:
-    std::vector<std::tuple<int, int, float>> travelStats;
+    std::vector<std::tuple<int, int, float, float>> travelStats;
     int population;
     int id;
     Node(std::string label, float x, float y, int population);
@@ -31,8 +31,8 @@ public:
     std::vector<std::reference_wrapper<Edge>> inEdges; // ref
     std::vector<std::reference_wrapper<Edge>> outEdges;
     std::vector<std::unique_ptr<Car>> storedCars;
-    void spawnCar(std::vector<int> path) {
-        std::unique_ptr<Car> car = std::make_unique<Car>(path);
+    void spawnCar(std::vector<int> path, float global_time) {
+        std::unique_ptr<Car> car = std::make_unique<Car>(path, global_time);
         storedCars.push_back(std::move(car));
     }
     void collectCars();

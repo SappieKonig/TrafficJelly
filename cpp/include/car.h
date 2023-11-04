@@ -25,7 +25,7 @@ private:
     float x = 0; // in m
     float baseTarget = 0; // in m/s
     float v; // in m/s (starts at speed limit of current edge (or maybe not, idfk))
-    float offset = 0; // in m/s (to be added to v, with respect to the speed limit)
+    float offset; // in m/s (to be added to v, with respect to the speed limit)
     int lane; // in number of lanes (starts at 0) (lane 0 is the rightmost lane)
 
     std::unique_ptr<Action> action = nullptr;
@@ -36,10 +36,11 @@ private:
 
 public:
     float age = 0; // in s
+    float global_time;
     int fromNodeID, toNodeID;
 
 //    Car(std::unique_ptr<RoutePlanner> routePlanner);
-    Car(std::vector<int> path);
+    Car(std::vector<int> path, float global_time);
     void syncCarToEdge(float targetSpeed) {
         baseTarget = targetSpeed;
         x = 0;

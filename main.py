@@ -17,7 +17,7 @@ ArrivalStats = tuple[int, int, float, float]
 
 def plot_arrival_stats_hist(arrival_stats: list[ArrivalStats], from_node_id: int, to_node_id: int):
     filtered_arrival_stats = [arrival_stat for arrival_stat in arrival_stats if arrival_stat[0] == from_node_id and arrival_stat[1] == to_node_id]
-    times_taken = [arrival_stat[2] / SCALE for arrival_stat in filtered_arrival_stats]
+    times_taken = [arrival_stat[2] for arrival_stat in filtered_arrival_stats]
     plt.hist(times_taken, bins=30)
     plt.show()
 

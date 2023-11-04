@@ -76,6 +76,7 @@ public:
         return reconstructPath(shortestPathMapping, startNodeID, endNodeID);
     }
     float global_time;
+    float getDeltaTime() const { return delta_time; }
 
     void spawnCars();
 };

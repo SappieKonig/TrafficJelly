@@ -5,7 +5,6 @@ from typing import TypeVar, TYPE_CHECKING
 
 import pygame
 
-from graphviz.simulation import Simulation
 from graphviz.view.game_view import GameView
 
 if TYPE_CHECKING:
@@ -29,6 +28,36 @@ class VizEdge:
     offset: pygame.Vector2
 
 
+@dataclass(kw_only=True)
+class GraphStyle:
+    node_radius_base: int
+    node_radius_inc: int
+    node_border_width: int
+    edge_width_base: int
+    edge_offset_base: int
+    edge_inner_width: int
+
+
+DEFAULT_STYLE = GraphStyle(
+    node_radius_base=5,
+    node_radius_inc=7,
+    node_border_width=1,
+    edge_width_base=10,
+    edge_inner_width=10-2,
+    edge_offset_base=7*2,
+)
+
+
+COMPACT_STYLE = GraphStyle(
+    node_radius_base=3,
+    node_radius_inc=3,
+    node_border_width=1,
+    edge_width_base=4,
+    edge_inner_width=4-2,
+    edge_offset_base=3*2,
+)
+
+
 class GameGraphView(GameView):
 
     FPS = 60
@@ -42,21 +71,35 @@ class GameGraphView(GameView):
         self.nodes = dict[int, VizNode]()
         self.edges = dict[int, VizEdge]()
 
-        self.node_radius_base = 5
-        self.node_radius_inc = 7
-        self.edge_width_base = 10
-        self.edge_offset_base = self.node_radius_inc * 2
+        self.style = DEFAULT_STYLE
 
         self.pixels_per_density_interval = 5
         self.density_interval_pixel_padding = 5
 
-        self.insert_viz_graph()
+        self.load_viz_graph()
 
         self.dt = 0
 
-        self.scale = .05
+        self.marginal_buffer = 100  # m
+        self.scale_rate_base = 2  # multiplier per second
+        self.scale_rate_multiplier_base = 2
+        self.pan_rate_base = 100  # pixels
+        self.pan_rate_multiplier_base = 4
 
-    def insert_viz_graph(self):
+        self.scale_rate = 1
+        self.scale_rate_multiplier = 1
+        self.pan_rate_x = 0
+        self.pan_rate_y = 0
+        self.pan_rate_multiplier = 1
+
+        self.scale = .05
+        self.pan_offset_x = 0
+        self.pan_offset_y = 0
+
+    def load_viz_graph(self):
+        self.nodes.clear()
+        self.edges.clear()
+
         sim = self.simulation
 
         edge_keys_per_node = defaultdict(set)
@@ -89,7 +132,7 @@ class GameGraphView(GameView):
             edges_count = edges_count_per_edge[edge_key]
             inserted_edges_count = inserted_edges_count_per_node_id_pair[edge_key]
             sign = 1 if node1_id > node0_id else -1
-            offset_dist = (inserted_edges_count - (edges_count - 1) / 2) * self.edge_offset_base * sign
+            offset_dist = (inserted_edges_count - (edges_count - 1) / 2) * self.style.edge_offset_base * sign
             offset_x = dy / dist * offset_dist
             offset_y = -dx / dist * offset_dist
 
@@ -100,14 +143,48 @@ class GameGraphView(GameView):
             inserted_edges_count_per_node_id_pair[edge_key] += 1
 
     def on_event(self, event: pygame.event.Event):
-        pass
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
+                self.pan_rate_multiplier = self.pan_rate_multiplier_base
+                self.scale_rate_multiplier = self.scale_rate_multiplier_base
+            if event.key == pygame.K_EQUALS or event.key == pygame.K_PLUS:
+                self.scale_rate = self.scale_rate_base
+            if event.key == pygame.K_MINUS or event.key == pygame.K_UNDERSCORE:
+                self.scale_rate = 1 / self.scale_rate_base
+            if event.key == pygame.K_LEFT:
+                self.pan_rate_x = self.pan_rate_base
+            if event.key == pygame.K_RIGHT:
+                self.pan_rate_x = -self.pan_rate_base
+            if event.key == pygame.K_UP:
+                self.pan_rate_y = self.pan_rate_base
+            if event.key == pygame.K_DOWN:
+                self.pan_rate_y = -self.pan_rate_base
+            if event.key == pygame.K_k:
+                self.style = COMPACT_STYLE if self.style == DEFAULT_STYLE else DEFAULT_STYLE
+                self.load_viz_graph()
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
+                self.pan_rate_multiplier = 1
+                self.scale_rate_multiplier = 1
+            if (event.key == pygame.K_EQUALS or event.key == pygame.K_PLUS or
+                    event.key == pygame.K_MINUS or event.key == pygame.K_UNDERSCORE):
+                self.scale_rate = 1
+            if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                self.pan_rate_x = 0
+            if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                self.pan_rate_y = 0
 
     def update_viewport(self):
-        pass
+        dt = self.game.dt
+        if dt != 0:
+            scale_factor = self.scale_rate ** (dt * self.scale_rate_multiplier)
+            self.scale *= scale_factor
+        self.pan_offset_x += dt * self.pan_rate_x * self.pan_rate_multiplier / self.scale
+        self.pan_offset_y += dt * self.pan_rate_y * self.pan_rate_multiplier / self.scale
 
     def update_state(self):
         while self.game.state.alpha >= 1:
-            self.simulation.step()
+            self.simulation.step_forward()
             self.game.state.alpha -= 1
 
     def render(self):
@@ -133,39 +210,37 @@ class GameGraphView(GameView):
         pygame.draw.line(self.screen, 'black',
                          real_offset + self.scale_and_round(edge.pos0),
                          real_offset + self.scale_and_round(edge.pos1),
-                         width=self.edge_width_base)
+                         width=self.style.edge_width_base)
         pygame.draw.line(self.screen, 'white',
                          real_offset + self.scale_and_round(edge.pos0),
                          real_offset + self.scale_and_round(edge.pos1),
-                         width=self.edge_width_base - 4)
+                         width=self.style.edge_inner_width)
 
         density_interval_dist_padding = self.density_interval_pixel_padding * meter_per_pixel
+
+        sorted_colors = ['green', 'orange']
+        indices_per_color = defaultdict(list)
         for i, count in enumerate(hist):
-            if count == 0:
-                continue
-            elif count == 1:
-                color = 'green'
-            else:
-                color = 'orange'
+            if count == 1:
+                indices_per_color['green'].append(i)
+            elif count > 1:
+                indices_per_color['orange'].append(i)
 
-            dist_start = edges[i]
-            dist_end = edges[i+1]
-            if count != 0:
-                dist_start -= density_interval_dist_padding
-                dist_end += density_interval_dist_padding
-            dist_start = max(0, dist_start)
-            dist_end = min(dist_end, dist_in_meters)
+        for color in sorted_colors:
+            for i in indices_per_color[color]:
+                dist_start = max(0, edges[i] - density_interval_dist_padding)
+                dist_end = min(edges[i+1] + density_interval_dist_padding, dist_in_meters)
 
-            pos_start = edge.pos0 + (dist_start / dist_in_meters) * (edge.pos1 - edge.pos0)
-            pos_end = edge.pos0 + (dist_end / dist_in_meters) * (edge.pos1 - edge.pos0)
-            pygame.draw.line(self.screen, color,
-                             real_offset + self.scale_and_round(pos_start),
-                             real_offset + self.scale_and_round(pos_end),
-                             width=self.edge_width_base - 4)
+                pos_start = edge.pos0 + (dist_start / dist_in_meters) * (edge.pos1 - edge.pos0)
+                pos_end = edge.pos0 + (dist_end / dist_in_meters) * (edge.pos1 - edge.pos0)
+                pygame.draw.line(self.screen, color,
+                                 real_offset + self.scale_and_round(pos_start),
+                                 real_offset + self.scale_and_round(pos_end),
+                                 width=self.style.edge_inner_width)
 
     def draw_node(self, node: VizNode):
         offset = self.get_offset()
-        radius = self.node_radius_base + self.node_radius_inc * node.size
+        radius = self.get_node_radius(node)
         center = offset + self.scale_and_round(node.pos)
 
         car_count = self.simulation.get_car_count_in_node(node.id)
@@ -179,7 +254,10 @@ class GameGraphView(GameView):
             color = 'red'
 
         pygame.draw.circle(self.screen, color, center, radius)
-        pygame.draw.circle(self.screen, 'black', center, radius, 2)
+        pygame.draw.circle(self.screen, 'black', center, radius, self.style.node_border_width)
+
+    def get_node_radius(self, node):
+        return self.style.node_radius_base + self.style.node_radius_inc * node.size
 
     def draw_info(self):
         text_surface = self.game.font.render(f'Time scale: {self.game.state.time_scale}', True, (0, 0, 0))
@@ -199,4 +277,4 @@ class GameGraphView(GameView):
         return pygame.Vector2(self.screen.get_rect().center)
 
     def get_offset(self):
-        return self.get_screen_center()
+        return self.get_screen_center() + pygame.Vector2(self.pan_offset_x, self.pan_offset_y) * self.scale

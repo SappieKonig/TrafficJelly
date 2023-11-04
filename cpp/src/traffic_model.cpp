@@ -214,7 +214,7 @@ void TrafficModelBuilder::build(std::string file_content)
 PYBIND11_MODULE(traffic_model, m) {
     pybind11::class_<TrafficModel>(m, "TrafficModel")
         .def(pybind11::init<const std::string &, float>())
-        .def("step", &TrafficModel::step)
+        .def("step_forward", &TrafficModel::step)
         .def("display", &TrafficModel::display)
         .def("get_edge_ids", &TrafficModel::getEdgeIDs)
         .def("get_node_ids", &TrafficModel::getNodeIDs)
@@ -224,6 +224,7 @@ PYBIND11_MODULE(traffic_model, m) {
         .def("get_node_pos", &TrafficModel::getNodePosition)
         .def("get_car_count_histogram_in_edge", &TrafficModel::getCarCountHistInEdge)
         .def("get_car_count_in_node", &TrafficModel::getCarCountInNode)
-        .def("get_fastest_path", &TrafficModel::getFastestPath);
+        .def("get_fastest_path", &TrafficModel::getFastestPath)
+        .def("get_delta_time", &TrafficModel::getDeltaTime);
 }
 

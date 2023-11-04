@@ -13,7 +13,7 @@ DELTA_TIME = 0.2
 def main():
     simulation = TrafficModel("graph.txt", DELTA_TIME)
     # simulation = create_simulation()
-    game = Game(simulation=simulation, delta_time=DELTA_TIME)
+    game = Game(simulation=simulation)
     game.push_view(GameGraphView(game=game))
     game.main()
 

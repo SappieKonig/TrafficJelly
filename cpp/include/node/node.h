@@ -42,7 +42,7 @@ public:
     float distanceTo(Node& other) const {
         return std::sqrt(std::pow(x - other.x, 2) + std::pow(y - other.y, 2));
     }
-    std::tuple<float, float> getPosition() const { return std::make_tuple(x, y); }
+    std::tuple<float, float> getPosition() const { return std::make_tuple(x, -y); }
     int getNCars() const { return storedCars.size(); }
 };
 

@@ -11,7 +11,7 @@ class Game:
 
     state: GameState
 
-    def __init__(self, *, simulation: Simulation, delta_time: float):
+    def __init__(self, *, simulation: Simulation):
         pygame.init()
 
         self.font = pygame.font.Font(None, 36)
@@ -27,7 +27,7 @@ class Game:
         self.dt = 0
         self.state = GameState(
             alpha=1,
-            delta_time=delta_time,
+            delta_time=simulation.get_delta_time(),
             time_scale=1.0,
             time_factor_pause=1.0,
         )

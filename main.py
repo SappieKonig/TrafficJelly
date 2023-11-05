@@ -1,9 +1,10 @@
 import os
-os.system("./build.sh")
+#os.system("./build.sh")
 
 from traffic_model import TrafficModel
 import time
 import matplotlib.pyplot as plt
+import numpy as np
 
 from graphviz.game import Game
 from graphviz.simulation import Simulation
@@ -31,7 +32,7 @@ def main():
     simulation = TrafficModel("graph.txt", DELTA_TIME, SCALE)
     start = time.time()
     steps_per_day = int(3600 * 24 / DELTA_TIME * SCALE)
-    until = int(12 / 24 * steps_per_day)
+    until = int(10 / 24 * steps_per_day)
     for i in range(until):
         if i % 100 == 0:
             cars_per_edge.append(simulation.get_n_cars_per_edge())
@@ -49,10 +50,25 @@ def main():
         for arrival_stat in arrival_stats:
             f.write(f"{arrival_stat[0]} {arrival_stat[1]} {arrival_stat[2]} {arrival_stat[3]}\n")
     filtered_arrival_stats = [arrival_stat for arrival_stat in arrival_stats if arrival_stat[0] == 0 and arrival_stat[1] == 1]
-    plot_arrival_stats_hist(arrival_stats, 0, 1)
-    # game = Game(simulation=simulation)
-    # game.push_view(GameGraphView(game=game))
-    # game.main()
+
+#   STABILIZATION PROOF:
+#   for i in range(len(cars_per_edge[0])):
+#       plt.plot(np.linspace(0, 23, len(cars_per_edge)), [cars_per_edge[j][i] for j in range(len(cars_per_edge))])
+#   plt.xlabel("Hour of the day")
+#   plt.ylabel("Amount of cars on road")
+#   plt.show()
+
+#   EDGE CHARACTERISTICS:
+    plt.bar(range(len(cars_per_edge[0])), [sum([cars_per_edge[i][j] for i in range(int(7/24*steps_per_day)//100, len(cars_per_edge))])/(len(cars_per_edge)-int(7/24*steps_per_day)//100)/simulation.get_edge_road_length(j) for j in range(len(cars_per_edge[0]))])
+    #plt.tick_params(axis='both', which='minor', labelsize=6)
+    plt.xticks(range(len(cars_per_edge[0])), [simulation.get_label_from_node_id(simulation.get_edge_start_node_id(j)) + " - " + simulation.get_label_from_node_id(simulation.get_edge_end_node_id(j)) for j in range(len(cars_per_edge[0]))], rotation='vertical')
+    plt.ylabel("Amount of cars per meter by road")
+    plt.show()
+
+#   plot_arrival_stats_hist(arrival_stats, 0, 1)
+    game = Game(simulation=simulation)
+    game.push_view(GameGraphView(game=game))
+    game.main()
 
 
 def create_simulation():

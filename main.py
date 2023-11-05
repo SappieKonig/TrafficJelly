@@ -11,6 +11,7 @@ from graphviz.simulation import Simulation
 from graphviz.view.game_graph_view import GameGraphView
 from graphviz.view.game_road_view import GameRoadView
 
+plt.rcParams.update({'font.size': 16, 'legend.fontsize':'large', 'axes.labelsize':'large', 'axes.titlesize':'large', 'xtick.labelsize':'large', 'ytick.labelsize':'large'})
 
 DELTA_TIME = 0.5
 SCALE = 1
@@ -52,23 +53,23 @@ def main():
     filtered_arrival_stats = [arrival_stat for arrival_stat in arrival_stats if arrival_stat[0] == 0 and arrival_stat[1] == 1]
 
 #   STABILIZATION PROOF:
-#   for i in range(len(cars_per_edge[0])):
-#       plt.plot(np.linspace(0, 23, len(cars_per_edge)), [cars_per_edge[j][i] for j in range(len(cars_per_edge))])
-#   plt.xlabel("Hour of the day")
-#   plt.ylabel("Amount of cars on road")
-#   plt.show()
+    for i in range(len(cars_per_edge[0])):
+        plt.plot(np.linspace(0, 23, len(cars_per_edge)), [cars_per_edge[j][i] for j in range(len(cars_per_edge))])
+    plt.xlabel("Hour of the day")
+    plt.ylabel("Amount of cars on road")
+    plt.show()
 
 #   EDGE CHARACTERISTICS:
     plt.bar(range(len(cars_per_edge[0])), [sum([cars_per_edge[i][j] for i in range(int(7/24*steps_per_day)//100, len(cars_per_edge))])/(len(cars_per_edge)-int(7/24*steps_per_day)//100)/simulation.get_edge_road_length(j) for j in range(len(cars_per_edge[0]))])
     #plt.tick_params(axis='both', which='minor', labelsize=6)
     plt.xticks(range(len(cars_per_edge[0])), [simulation.get_label_from_node_id(simulation.get_edge_start_node_id(j)) + " - " + simulation.get_label_from_node_id(simulation.get_edge_end_node_id(j)) for j in range(len(cars_per_edge[0]))], rotation='vertical')
-    plt.ylabel("Amount of cars per meter by road")
+    plt.ylabel("Amount of cars per meter")
     plt.show()
 
 #   plot_arrival_stats_hist(arrival_stats, 0, 1)
-    game = Game(simulation=simulation)
-    game.push_view(GameGraphView(game=game))
-    game.main()
+#   game = Game(simulation=simulation)
+#   game.push_view(GameGraphView(game=game))
+#   game.main()
 
 
 def create_simulation():

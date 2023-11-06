@@ -16,7 +16,7 @@ class Game:
 
         self.font = pygame.font.Font(None, 36)
 
-        self.screen = pygame.display.set_mode((1280, 720))
+        self.screen = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
         self.clock = pygame.time.Clock()
         self.display = pygame.display
         self.simulation = simulation
@@ -35,6 +35,10 @@ class Game:
     def push_view(self, view: GameView):
         self.views.append(view)
 
+    def pop_view(self):
+        if len(self.views) > 1:
+            self.views.pop()
+
     def main(self):
         self.loop()
         pygame.quit()
@@ -51,8 +55,8 @@ class Game:
             self.render()
 
             self.display.flip()
-            self.dt = self.clock.tick(self.FPS) / 1000 * self.state.time_factor_pause
-            self.state.alpha += self.dt * self.state.time_scale / self.state.delta_time
+            self.dt = self.clock.tick(self.FPS) / 1000
+            self.state.alpha += self.dt * self.state.time_scale / self.state.delta_time * self.state.time_factor_pause
 
     def on_event(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN:
@@ -62,6 +66,8 @@ class Game:
                 self.state.time_scale /= self.time_scale_rate
             if event.key == pygame.K_SPACE:
                 self.toggle_pause()
+            if event.key == pygame.K_ESCAPE:
+                self.pop_view()
         self.view.on_event(event)
 
     def update_viewport(self):

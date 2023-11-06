@@ -20,7 +20,6 @@ class Edge
 {
 protected:
     // To keep track of every car in the driving order.
-    std::list<std::unique_ptr<Car>> cars;
     float const speedLimit; // in m/s
     int id;
 
@@ -28,6 +27,7 @@ protected:
     std::string const label;
 public:
     float length; // In meters
+    std::list<std::unique_ptr<Car>> cars;
 
     Node& outNode;
     Edge(Node& inNode, Node& outNode, std::string label, float speedLimit);
@@ -41,6 +41,15 @@ public:
         setActions();
         updateCars(dt);
         sortCars();
+    }
+    std::vector<int> getCarIDsOnInterval(std::tuple<float, float> interval) {
+        std::vector<int> carIDs;
+        for (auto& car : cars) {
+            if (std::get<0>(interval) <= car->getX() && car->getX() <= std::get<1>(interval)) {
+                carIDs.push_back(car->carID);
+            }
+        }
+        return carIDs;
     }
     std::string getLabel() const;
     int getNCars() const { return cars.size(); }

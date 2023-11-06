@@ -1,9 +1,8 @@
-import math
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 import pygame
 
-from graphviz.simulation import Simulation
 from graphviz.state.game_road_state import GameRoadState, VizCar
 from graphviz.util.color import get_random_color
 from graphviz.view.game_view import GameView
@@ -12,8 +11,33 @@ if TYPE_CHECKING:
     from graphviz.game import Game
 
 
+@dataclass(kw_only=True)
+class RoadStyle:
+    lane_width: float
+    car_length: float
+    car_width: float
+
+
+DEFAULT_STYLE = RoadStyle(
+    lane_width=3.5 * 4,
+    car_length=4.5 * 2,
+    car_width=3.5 * 4,
+)
+
+
+COMPACT_STYLE = RoadStyle(
+    lane_width=3.5,
+    car_length=4.5,
+    car_width=3.5,  # = lane_width
+    # Realistic:
+    # car_width=2,
+)
+
+
 class GameRoadView(GameView):
-    def __init__(self, *, game: 'Game', edge_id: int):
+    def __init__(self, *,
+                 game: 'Game', edge_id: int,
+                 pan_offset_x: float = 0):
         self.game = game
         self.edge_id = edge_id
         self.screen = game.screen
@@ -24,10 +48,8 @@ class GameRoadView(GameView):
         self.color_mapping = dict()
 
         self.max_speed = 300
-        self.lane_width = 3.5
-        self.car_length = 4.5
-        self.car_width = self.lane_width
-        # self.car_width = 2  # True car width
+
+        self.style = DEFAULT_STYLE
 
         self.lane_count = game.simulation.get_edge_lane_count(edge_id)
         self.road_length = game.simulation.get_edge_road_length(edge_id)
@@ -46,7 +68,7 @@ class GameRoadView(GameView):
 
         self.state = GameRoadState(
             scale=1,
-            pan_offset_x=0,
+            pan_offset_x=pan_offset_x,
             pan_offset_y=0,
             prev_cars={},
             next_cars={},
@@ -69,6 +91,8 @@ class GameRoadView(GameView):
                 self.pan_rate_y = self.pan_rate_base
             if event.key == pygame.K_DOWN:
                 self.pan_rate_y = -self.pan_rate_base
+            if event.key == pygame.K_k:
+                self.style = COMPACT_STYLE if self.style == DEFAULT_STYLE else DEFAULT_STYLE
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
                 self.pan_rate_multiplier = 1
@@ -84,11 +108,8 @@ class GameRoadView(GameView):
     def update_viewport(self):
         dt = self.game.dt
         if dt != 0:
-            screen_center = self.get_screen_center()
             scale_factor = self.scale_rate ** (dt * self.scale_rate_multiplier)
             self.state.scale *= scale_factor
-            self.state.pan_offset_x -= (scale_factor - 1) * screen_center.x / self.state.scale
-            self.state.pan_offset_y -= (scale_factor - 1) * screen_center.y / self.state.scale
         self.state.pan_offset_x += dt * self.pan_rate_x * self.pan_rate_multiplier / self.state.scale
         self.state.pan_offset_y += dt * self.pan_rate_y * self.pan_rate_multiplier / self.state.scale
 
@@ -110,11 +131,11 @@ class GameRoadView(GameView):
         self.draw_info()
 
     def draw_road(self):
-        offset = self.get_scaled_offset()
+        offset = self.get_offset()
         road_rect = pygame.rect.Rect((
             0, 0,
             self.road_length * self.state.scale,
-            max((1, self.lane_count * self.lane_width * self.state.scale)),
+            max((1, self.lane_count * self.style.lane_width * self.state.scale)),
         ))
         road_rect.move_ip(offset)
 
@@ -122,7 +143,7 @@ class GameRoadView(GameView):
         pygame.draw.rect(self.screen, 'black', road_rect)
 
     def draw_cars(self):
-        offset = self.get_scaled_offset()
+        offset = self.get_offset()
 
         scale = self.state.scale
         # alpha = 0 -> interpolation is in next_cars
@@ -146,10 +167,10 @@ class GameRoadView(GameView):
             y = alpha * next_y + beta * prev_y
 
             car_rect = pygame.rect.Rect(
-                (x - self.car_width * 0.5) * scale,
-                (self.lane_width * (self.lane_count - y - 0.5) - self.car_width * 0.5) * scale,
-                self.car_length * scale,
-                self.car_width * scale
+                (x - self.style.car_width * 0.5) * scale,
+                (self.style.lane_width * (self.lane_count - y - 0.5) - self.style.car_width * 0.5) * scale,
+                self.style.car_length * scale,
+                self.style.car_width * scale
             )
             car_rect.move_ip(offset)
 
@@ -175,18 +196,15 @@ class GameRoadView(GameView):
     def get_displayed_cars_interval(self):
         screen_rect = self.screen.get_rect()
         max_speed_buffer = self.game.dt * self.max_speed
-        center = -self.get_offset().x + self.get_screen_center().x / self.state.scale
+        center = -self.get_offset().x / self.state.scale + self.get_screen_center().x / self.state.scale
         radius = (screen_rect.width * 0.5 + max_speed_buffer) / self.state.scale + self.marginal_buffer
         return center - radius, center + radius
-
-    def get_scaled_offset(self):
-        return self.get_offset() * self.state.scale
 
     def get_offset(self):
         return self.get_screen_center() + pygame.Vector2(
             self.state.pan_offset_x,
             self.state.pan_offset_y,
-        )
+        ) * self.state.scale
 
     def get_screen_center(self) -> pygame.Vector2:
         return pygame.Vector2(self.screen.get_rect().center)

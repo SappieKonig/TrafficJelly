@@ -6,8 +6,8 @@ std::default_random_engine Car::generator(time(0));
 std::normal_distribution<double> Car::normalDistribution(0, 3);
 
 
-Car::Car(std::vector<int> path, float global_time, float scale) :
-    path(path), global_time(global_time), scale(scale)
+Car::Car(std::vector<int> path, float global_time, float scale, int carID) :
+    path(path), global_time(global_time), scale(scale), carID(carID)
 {
     fromNodeID = path[0];
     toNodeID = path[path.size() - 1];

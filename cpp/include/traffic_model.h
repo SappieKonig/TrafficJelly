@@ -39,6 +39,7 @@ private:
     int population;
     std::vector<std::shared_ptr<Edge>> edges;
     float scale;
+    int carID = 0;
 public:
     std::default_random_engine generator;
     std::uniform_real_distribution<float> distribution;
@@ -59,6 +60,30 @@ public:
     std::vector<int> getNodeIDs();
     float getEdgeRoadLength(int idx) {
         return edges[idx]->getLength();
+    }
+    int getEdgeLaneCount(int idx) {
+        return 3;
+    }
+    int getCarLane(int carID) {
+        for (auto& edge : edges) {
+            for (auto& car : edge->cars) {
+                if (car->carID == carID) {
+                    return car->lane;
+                }
+            }
+        }
+    }
+    int getCarX(int carID) {
+        for (auto& edge : edges) {
+            for (auto& car : edge->cars) {
+                if (car->carID == carID) {
+                    return car->getX();
+                }
+            }
+        }
+    }
+    std::vector<int> getCarIDsInEdgeOnInterval(int idx, std::tuple<float, float> interval) {
+        return edges[idx]->getCarIDsOnInterval(interval);
     }
     int getEdgeStartNodeID(int idx) {
         return edges[idx]->getInNode().getID();

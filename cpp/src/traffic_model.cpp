@@ -61,7 +61,8 @@ void TrafficModel::spawnCar() {
             p -= mappingProbabilities[i][j];
             if (p < 0) {
                 auto path = getFastestPath(i, j);
-                nodes[i]->spawnCar(path, global_time, scale);
+                nodes[i]->spawnCar(path, global_time, scale, carID);
+                carID++;
                 return;
             }
         }
@@ -256,6 +257,11 @@ PYBIND11_MODULE(traffic_model, m) {
         .def("get_travel_stats", &TrafficModel::getTravelStats)
         .def("get_label_from_node_id", &TrafficModel::getLabelFromNodeID)
         .def("get_label_from_edge_id", &TrafficModel::getLabelFromEdgeID)
-        .def("get_edge_length", &TrafficModel::getEdgeRoadLength);
+        .def("get_edge_length", &TrafficModel::getEdgeRoadLength)
+        .def("get_edge_lane_count", &TrafficModel::getEdgeLaneCount)
+        .def("get_car_ids_in_edge_on_interval", &TrafficModel::getCarIDsInEdgeOnInterval)
+        .def("get_car_x", &TrafficModel::getCarX)
+        .def("get_car_lane", &TrafficModel::getCarLane);
+
 }
 

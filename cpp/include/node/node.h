@@ -31,8 +31,8 @@ public:
     std::vector<std::reference_wrapper<Edge>> inEdges; // ref
     std::vector<std::reference_wrapper<Edge>> outEdges;
     std::vector<std::unique_ptr<Car>> storedCars;
-    void spawnCar(std::vector<int> path, float global_time, float scale) {
-        std::unique_ptr<Car> car = std::make_unique<Car>(path, global_time, scale);
+    void spawnCar(std::vector<int> path, float global_time, float scale, int carID) {
+        std::unique_ptr<Car> car = std::make_unique<Car>(path, global_time, scale, carID);
         storedCars.push_back(std::move(car));
     }
     void collectCars();
